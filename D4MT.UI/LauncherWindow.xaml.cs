@@ -109,25 +109,25 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
 
     private void BrowseProjectsDirectoryButton_Click(object sender, RoutedEventArgs e) {
         const string DialogTitle = "Select D4MT Projects Directory";
-        string initialDirectory = string.IsNullOrWhiteSpace(DataContext.ProjectsDirectoryPath) ?
-            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) :
-            DataContext.ProjectsDirectoryPath;
+        string initialDirectory = string.IsNullOrWhiteSpace(DataContext.ProjectsDirectoryPath) is false && Directory.Exists(DataContext.ProjectsDirectoryPath) ?
+            DataContext.ProjectsDirectoryPath :
+            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         DataContext.ProjectsDirectoryPath = GetUserSelectedDirectory(DialogTitle, initialDirectory) ?? DataContext.ProjectsDirectoryPath;
     }
 
     private void BrowseGameDirectoryButton_Click(object sender, RoutedEventArgs e) {
         const string DialogTitle = "Select Democracy 4 Game Directory";
-        string initialDirectory = string.IsNullOrWhiteSpace(DataContext.GameDirectoryPath) ?
-            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) :
-            DataContext.GameDirectoryPath;
+        string initialDirectory = string.IsNullOrWhiteSpace(DataContext.GameDirectoryPath) is false && Directory.Exists(DataContext.GameDirectoryPath) ?
+            DataContext.GameDirectoryPath :
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
         DataContext.GameDirectoryPath = GetUserSelectedDirectory(DialogTitle, initialDirectory) ?? DataContext.GameDirectoryPath;
     }
 
     private void BrowseModsDirectoryButton_Click(object sender, RoutedEventArgs e) {
         const string DialogTitle = "Select Democracy 4 Mods Directory";
-        string initialDirectory = string.IsNullOrWhiteSpace(DataContext.ModsDirectoryPath) ?
-            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) :
-            DataContext.ModsDirectoryPath;
+        string initialDirectory = string.IsNullOrWhiteSpace(DataContext.ModsDirectoryPath) is false && Directory.Exists(DataContext.ModsDirectoryPath) ?
+            DataContext.ModsDirectoryPath :
+            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         DataContext.ModsDirectoryPath = GetUserSelectedDirectory(DialogTitle, initialDirectory) ?? DataContext.ModsDirectoryPath;
     }
 
