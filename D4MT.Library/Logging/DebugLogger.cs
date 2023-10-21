@@ -9,11 +9,6 @@ public sealed class DebugLogger(string name) : IDebugLogger, IDebugLoggerCreator
     public Guid Id { get; } = Guid.NewGuid();
     public string Name { get; } = name;
 
-    private readonly HashSet<IDebugLogger> _children = new();
-    public IEnumerable<IDebugLogger> Children {
-        get { return _children; }
-    }
-
     private DebugLogger(IDebugLogger parent, string name) : this(name) {
         Parent = parent;
     }
