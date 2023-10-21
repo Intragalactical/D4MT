@@ -62,7 +62,6 @@ public sealed class Configuration : IConfiguration, IUnsafeConfiguration, IDeser
             AllowTrailingCommas = true,
             WriteIndented = true,
         };
-        options.Converters.Add(DirectoryInfoJsonConverter.Shared);
         options.Converters.Add(CultureInfoJsonConverter.Shared);
         return options;
     }

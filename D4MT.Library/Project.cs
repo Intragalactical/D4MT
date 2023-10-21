@@ -1,6 +1,5 @@
 ﻿using D4MT.Library.Common;
 using D4MT.Library.Exceptions;
-using D4MT.Library.Extensions;
 using D4MT.Library.Text;
 
 using System.Diagnostics;
@@ -46,9 +45,6 @@ public interface IProjectCreator {
 
 [JsonSerializable(typeof(Project))]
 public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>, IProjectCreator {
-    //private const char Dot = '.';
-    //private static readonly RenameOptions ProjectRenameOptions = new() { ContainsExtension = false };
-
     private const FileMode SaveFileMode = FileMode.Create;
     private const FileMode ReadFileMode = FileMode.Open;
     private const FileAccess SaveFileAccess = FileAccess.Write;
@@ -248,10 +244,8 @@ public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>
 
     public bool TrySetName(string projectName, ITextValidator projectNameValidator) {
         if (
-            DirectoryPath is null ||
-            DirectoryPath.ToDirectoryInfo() is not DirectoryInfo directoryInfo ||
-            directoryInfo.Exists is false ||
-            directoryInfo.Parent is not DirectoryInfo parentDirectoryInfo ||
+            Directory.Exists(DirectoryPath) is false ||
+            Directory.GetParent(DirectoryPath) is not DirectoryInfo parentDirectoryInfo ||
             parentDirectoryInfo.Exists is false ||
             string.IsNullOrWhiteSpace(projectName) ||
             projectName.Any(IsInvalidPathCharacter) ||
@@ -266,8 +260,8 @@ public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>
             return false;
         }
 
-        directoryInfo.MoveTo(newDirectoryPath);
-        return true;
+        Directory.Move(DirectoryPath, newDirectoryPath);
+        return Directory.Exists(newDirectoryPath);
     }
 
     public bool Equals(Project? other) {

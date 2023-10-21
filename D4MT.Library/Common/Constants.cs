@@ -17,7 +17,7 @@ public static class Constants {
 
         public static class FormatLiterals {
             public const string RelativeProjectPath = @".\{0}\" + Patterns.ProjectFileName;
-            public const string EditorWindowTitle = @"Project {0} - Democracy 4 Modding Tool";
+            public const string EditorWindowTitle = "Project {0} - Democracy 4 Modding Tool";
         }
     }
 
