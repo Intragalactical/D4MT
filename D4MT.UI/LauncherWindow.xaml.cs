@@ -13,7 +13,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 
 using WindowsFormsDialogResult = System.Windows.Forms.DialogResult;
-using WindowsFormsFolderDialog = System.Windows.Forms.FolderBrowserDialog;
+using WindowsFormsDirectoryDialog = System.Windows.Forms.FolderBrowserDialog;
 
 namespace D4MT.UI;
 
@@ -60,8 +60,8 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
         }
     }
 
-    private static string? GetUserSelectedFolder(string dialogTitle, string initialDirectory) {
-        using WindowsFormsFolderDialog folderDialog = new() {
+    private static string? GetUserSelectedDirectory(string dialogTitle, string initialDirectory) {
+        using WindowsFormsDirectoryDialog folderDialog = new() {
             InitialDirectory = initialDirectory,
             Description = dialogTitle,
             UseDescriptionForTitle = true
@@ -78,7 +78,7 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
 
         ProcessStartInfo explorerStartInfo = new() {
             FileName = Constants.Strings.Patterns.ExplorerFileName,
-            WorkingDirectory = Constants.Strings.Paths.WindowsFolder,
+            WorkingDirectory = Constants.Strings.Paths.WindowsDirectory,
             WindowStyle = ProcessWindowStyle.Normal,
             ErrorDialog = true,
             ErrorDialogParentHandle = windowHandle,
@@ -111,22 +111,22 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
 
     }
 
-    private void BrowseProjectsFolderButton_Click(object sender, RoutedEventArgs e) {
-        const string DialogTitle = "Select D4MT Projects Folder";
+    private void BrowseProjectsDirectoryButton_Click(object sender, RoutedEventArgs e) {
+        const string DialogTitle = "Select D4MT Projects Directory";
         string initialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        DataContext.ProjectsDirectoryPath = GetUserSelectedFolder(DialogTitle, initialDirectory) ?? DataContext.ProjectsDirectoryPath;
+        DataContext.ProjectsDirectoryPath = GetUserSelectedDirectory(DialogTitle, initialDirectory) ?? DataContext.ProjectsDirectoryPath;
     }
 
-    private void BrowseGameFolderButton_Click(object sender, RoutedEventArgs e) {
-        const string DialogTitle = "Select Democracy 4 Game Folder";
+    private void BrowseGameDirectoryButton_Click(object sender, RoutedEventArgs e) {
+        const string DialogTitle = "Select Democracy 4 Game Directory";
         string initialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-        DataContext.GameDirectoryPath = GetUserSelectedFolder(DialogTitle, initialDirectory) ?? DataContext.GameDirectoryPath;
+        DataContext.GameDirectoryPath = GetUserSelectedDirectory(DialogTitle, initialDirectory) ?? DataContext.GameDirectoryPath;
     }
 
-    private void BrowseModsFolderButton_Click(object sender, RoutedEventArgs e) {
-        const string DialogTitle = "Select Democracy 4 Mods Folder";
+    private void BrowseModsDirectoryButton_Click(object sender, RoutedEventArgs e) {
+        const string DialogTitle = "Select Democracy 4 Mods Directory";
         string initialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        DataContext.ModsDirectoryPath = GetUserSelectedFolder(DialogTitle, initialDirectory) ?? DataContext.ModsDirectoryPath;
+        DataContext.ModsDirectoryPath = GetUserSelectedDirectory(DialogTitle, initialDirectory) ?? DataContext.ModsDirectoryPath;
     }
 
     private async void CreateProjectButton_Click(object sender, RoutedEventArgs e) {

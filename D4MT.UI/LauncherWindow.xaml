@@ -79,12 +79,12 @@
                 <DockPanel LastChildFill="True"
                            Grid.Row="0"
                            Grid.Column="2">
-                    <Button Name="BrowseGameFolderButton"
+                    <Button Name="BrowseGameDirectoryButton"
                             Content="Browse..."
                             DockPanel.Dock="Right"
                             Width="60"
-                            Margin="5 0 0 0" Click="BrowseGameFolderButton_Click"/>
-                    <controls:D4MTTextBox x:Name="GameFolderTextBox"
+                            Margin="5 0 0 0" Click="BrowseGameDirectoryButton_Click"/>
+                    <controls:D4MTTextBox x:Name="GameDirectoryTextBox"
                                           Text="{Binding DataContext.GameDirectoryPath, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           DockPanel.Dock="Left"
                                           PlaceholderText="Democracy 4 game directory..."
@@ -97,12 +97,12 @@
                 <DockPanel LastChildFill="True"
                            Grid.Row="2"
                            Grid.Column="2">
-                    <Button Name="BrowseModsFolderButton"
+                    <Button Name="BrowseModsDirectoryButton"
                             Content="Browse..."
                             DockPanel.Dock="Right"
                             Width="60"
-                            Margin="5 0 0 0" Click="BrowseModsFolderButton_Click"/>
-                    <controls:D4MTTextBox x:Name="ModsFolderTextBox"
+                            Margin="5 0 0 0" Click="BrowseModsDirectoryButton_Click"/>
+                    <controls:D4MTTextBox x:Name="ModsDirectoryTextBox"
                                           Text="{Binding DataContext.ModsDirectoryPath, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           DockPanel.Dock="Left"
                                           PlaceholderText="Democracy 4 mods directory..."
@@ -115,15 +115,15 @@
                 <DockPanel LastChildFill="True"
                            Grid.Row="4"
                            Grid.Column="2">
-                    <Button Name="BrowseProjectsFolderButton"
+                    <Button Name="BrowseProjectsDirectoryButton"
                             Content="Browse..."
                             DockPanel.Dock="Right"
                             Width="60"
-                            Margin="5 0 0 0" Click="BrowseProjectsFolderButton_Click"/>
-                    <controls:D4MTTextBox x:Name="ProjectsFolderTextBox"
+                            Margin="5 0 0 0" Click="BrowseProjectsDirectoryButton_Click"/>
+                    <controls:D4MTTextBox x:Name="ProjectsDirectoryTextBox"
                                           Text="{Binding DataContext.ProjectsDirectoryPath, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           DockPanel.Dock="Left"
-                                          PlaceholderText="Projects folder..."
+                                          PlaceholderText="Projects directory..."
                                           ToolTip="{Binding DataContext.ProjectsDirectoryPath, ElementName=root, Mode=OneWay}" />
                 </DockPanel>
             </Grid>

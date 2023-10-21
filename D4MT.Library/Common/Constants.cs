@@ -12,7 +12,7 @@ public static class Constants {
 
         public static class Paths {
             public const string ConfigurationFile = @".\Configuration.json";
-            public static readonly string WindowsFolder = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            public static readonly string WindowsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
         }
 
         public static class FormatLiterals {
