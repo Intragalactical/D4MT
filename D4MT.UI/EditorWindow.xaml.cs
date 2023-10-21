@@ -11,9 +11,6 @@ using System.Windows;
 
 namespace D4MT.UI;
 
-/// <summary>
-/// Interaction logic for ProjectWindow.xaml
-/// </summary>
 public partial class EditorWindow : Window, IViewModelDataContext<IProjectViewModel> {
     private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly ITextValidator _projectNameValidator;

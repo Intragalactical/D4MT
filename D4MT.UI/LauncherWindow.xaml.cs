@@ -20,9 +20,6 @@ using WindowsFormsDirectoryDialog = System.Windows.Forms.FolderBrowserDialog;
 
 namespace D4MT.UI;
 
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
 public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherViewModel> {
     private readonly IDebugLogger _logger;
     private readonly CancellationTokenSource _cancellationTokenSource;
