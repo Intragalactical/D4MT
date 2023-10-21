@@ -1,5 +1,6 @@
 ﻿using D4MT.Library;
 using D4MT.Library.Common;
+using D4MT.Library.Logging;
 using D4MT.Library.Text;
 using D4MT.UI.Common;
 using D4MT.UI.ViewModels;
@@ -22,6 +23,7 @@ namespace D4MT.UI;
 /// Interaction logic for MainWindow.xaml
 /// </summary>
 public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherViewModel> {
+    private readonly IDebugLogger _logger;
     private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly WindowInteropHelper _windowInteropHelper;
     private readonly ITextValidator _projectNameValidator;
@@ -41,6 +43,7 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
     }
 
     public LauncherWindow() {
+        _logger = DebugLogger.CreateFromType(typeof(LauncherWindow));
         _projectNameValidator = ProjectNameValidator.Shared;
         _cancellationTokenSource = new();
 
@@ -72,7 +75,7 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
             null;
     }
 
-    private static async Task OpenExplorerAsync(nint windowHandle, string path, CancellationToken cancellationToken) {
+    private static async Task OpenExplorerAsync(IDebugLogger logger, nint windowHandle, string path, CancellationToken cancellationToken) {
         if (cancellationToken.IsCancellationRequested) {
             return;
         }
@@ -93,11 +96,11 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
         bool started = explorerProcess.Start();
 
         if (!started) {
-            Debug.WriteLine("Explorer process not started!");
+            logger.Log("Explorer process not started!");
             return;
         }
 
-        Debug.WriteLineIf(
+        logger.LogIf(
             explorerProcess is { HasExited: false, Responding: true },
             $"Process {explorerProcess.ProcessName} (Id: {explorerProcess.Id}) started with handle {explorerProcess.Handle}."
         );
@@ -105,7 +108,7 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
         await explorerProcess.WaitForExitAsync(cancellationToken);
         int exitCode = explorerProcess.ExitCode;
         explorerProcess.Dispose();
-        Debug.WriteLine($"Process exited with code {exitCode}. Disposed.");
+        logger.Log($"Process exited with code {exitCode}. Disposed.");
     }
 
     private void BrowseProjectsDirectoryButton_Click(object sender, RoutedEventArgs e) {
@@ -217,7 +220,7 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
 
         nint currentWindowHandle = _windowInteropHelper.Handle;
         string projectPath = selectedProject.DirectoryPath;
-        _ = OpenExplorerAsync(currentWindowHandle, projectPath, _cancellationTokenSource.Token)
+        _ = OpenExplorerAsync(_logger, currentWindowHandle, projectPath, _cancellationTokenSource.Token)
             .ContinueWith(t => { _synchronizationContext.Post(OnAggregateExceptionThrow, t.Exception); }, _cancellationTokenSource.Token);
     }
 }
