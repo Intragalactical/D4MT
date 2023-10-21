@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="D4MT.UI.Controls.D4MTTextBox"
+             x:Name="root"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:D4MT.UI.Controls"
+             ToolTipService.IsEnabled="{Binding IsToolTipEnabled, Mode=OneWay}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <VisualBrush x:Key="PlaceholderBrush" Stretch="None" AlignmentX="{Binding Path=PlaceholderHorizontalAlignment, Mode=OneWay}">
+            <VisualBrush.Transform>
+                <TranslateTransform X="{Binding PlaceholderMarginLeft, Mode=OneWay}" Y="{Binding PlaceholderMarginTop, Mode=OneWay}" />
+            </VisualBrush.Transform>
+            <VisualBrush.Visual>
+                <TextBlock Text="{Binding PlaceholderText, Mode=OneWay}"
+                           Foreground="{Binding PlaceholderForeground, Mode=OneWay}"
+                           FontSize="{Binding FontSize, Mode=OneWay}" />
+            </VisualBrush.Visual>
+        </VisualBrush>
+    </UserControl.Resources>
+    <Grid>
+        <TextBox x:Name="UserControlTextBox"
+                 Height="25"
+                 VerticalScrollBarVisibility="Disabled"
+                 VerticalContentAlignment="Center"
+                 Text="{Binding Text, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 TextChanged="UserControlTextBox_TextChanged"
+                 LostFocus="UserControlTextBox_LostFocus"
+                 ToolTipService.IsEnabled="False"
+                 GotFocus="UserControlTextBox_GotFocus">
+            <TextBox.Style>
+                <Style TargetType="TextBox">
+                    <Setter Property="Background" Value="{Binding Background, ElementName=root, Mode=OneWay}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ShowPlaceholder, Mode=OneWay}" Value="True">
+                            <Setter Property="Background" Value="{StaticResource PlaceholderBrush}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+    </Grid>
+</UserControl>

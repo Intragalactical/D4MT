@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34009.444
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "D4MT.UI", "D4MT.UI\D4MT.UI.csproj", "{DD499875-A4FB-4C2C-B169-A3B8F681C598}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "D4MT.Library", "D4MT.Library\D4MT.Library.csproj", "{C6CC94C7-6850-4C9C-990E-CB13524F8632}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{25F3CFD2-99B7-41F9-A7C8-5A36B0C60443}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DD499875-A4FB-4C2C-B169-A3B8F681C598}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD499875-A4FB-4C2C-B169-A3B8F681C598}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD499875-A4FB-4C2C-B169-A3B8F681C598}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD499875-A4FB-4C2C-B169-A3B8F681C598}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6CC94C7-6850-4C9C-990E-CB13524F8632}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6CC94C7-6850-4C9C-990E-CB13524F8632}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6CC94C7-6850-4C9C-990E-CB13524F8632}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6CC94C7-6850-4C9C-990E-CB13524F8632}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E11A995A-880F-45FF-93D0-93B80A673F61}
+	EndGlobalSection
+EndGlobal
