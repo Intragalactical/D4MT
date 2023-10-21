@@ -1,4 +1,5 @@
 ﻿using D4MT.Library;
+using D4MT.Library.Logging;
 using D4MT.Library.Text;
 using D4MT.UI.Common;
 using D4MT.UI.ViewModels;
@@ -55,7 +56,7 @@ public partial class EditorWindow : Window, IViewModelDataContext<IProjectViewMo
         }
 
         if (_launcherWindow is null or { ShowActivated: false }) {
-            _launcherWindow ??= new LauncherWindow();
+            _launcherWindow ??= new LauncherWindow(DebugLogger.Shared.CreateChildFromType(typeof(LauncherWindow)));
             _launcherWindow.Show();
         }
 
@@ -65,5 +66,9 @@ public partial class EditorWindow : Window, IViewModelDataContext<IProjectViewMo
                 Application.Current.Dispatcher.Invoke(Close);
             });
         }
+    }
+
+    private void Window_Loaded(object sender, RoutedEventArgs e) {
+
     }
 }

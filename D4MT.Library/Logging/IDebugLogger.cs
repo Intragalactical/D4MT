@@ -1,10 +1,12 @@
 ﻿namespace D4MT.Library.Logging;
 
-public interface IDebugLogger {
+public interface IDebugLogger : IEquatable<IDebugLogger> {
+    IDebugLogger? Parent { get; }
     Guid Id { get; }
+    string Name { get; }
 
     void LogIf(bool condition, string message, LogLevel logLevel = LogLevel.Information);
     void Log(string message, LogLevel logLevel = LogLevel.Information);
-
-    static abstract IDebugLogger CreateFromType(Type callingType);
+    IDebugLogger CreateChildWithName(string name);
+    IDebugLogger CreateChildFromType(Type callingType);
 }

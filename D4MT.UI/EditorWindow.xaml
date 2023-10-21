@@ -8,7 +8,9 @@
         Title="{Binding WindowTitle, Mode=OneWay}"
         WindowStartupLocation="CenterScreen"
         Height="450"
-        Width="800" Closing="Window_Closing">
+        Width="800"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10" />

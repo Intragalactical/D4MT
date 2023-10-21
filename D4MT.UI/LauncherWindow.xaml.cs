@@ -42,8 +42,8 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
         }
     }
 
-    public LauncherWindow() {
-        _logger = DebugLogger.CreateFromType(typeof(LauncherWindow));
+    public LauncherWindow(IDebugLogger logger) {
+        _logger = logger;
         _projectNameValidator = ProjectNameValidator.Shared;
         _cancellationTokenSource = new();
 
@@ -222,5 +222,9 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
         string projectPath = selectedProject.DirectoryPath;
         _ = OpenExplorerAsync(_logger, currentWindowHandle, projectPath, _cancellationTokenSource.Token)
             .ContinueWith(t => { _synchronizationContext.Post(OnAggregateExceptionThrow, t.Exception); }, _cancellationTokenSource.Token);
+    }
+
+    private void Window_Loaded(object sender, RoutedEventArgs e) {
+        _logger.Log("LauncherWindow loaded.");
     }
 }
