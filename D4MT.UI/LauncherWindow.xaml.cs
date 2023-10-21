@@ -149,7 +149,12 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
                 GetFolderBrowserDialogTitle(configurationDirectory),
                 GetFolderBrowserDialogInitialDirectory(configurationDirectory)
             ) ?? DataContext.GetConfigurationDirectoryPath(configurationDirectory);
-        DataContext.SetConfigurationDirectoryPath(configurationDirectory, directoryPath);
+        bool configurationDirectoryPathSet = DataContext.TrySetConfigurationDirectoryPath(configurationDirectory, directoryPath);
+        _logger.LogIf(
+            configurationDirectoryPathSet is false,
+            $"Could not set Configuration Directory {configurationDirectory} path to {directoryPath}!",
+            LogLevel.Error
+        );
     }
 
     private async void CreateProjectButton_Click(object sender, RoutedEventArgs e) {
@@ -173,9 +178,9 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
             throw new Exception("Could not create new project!");
         }
 
-        EditorWindow editorWindow = new(project, _projectNameValidator, _cancellationTokenSource);
-        editorWindow.Show();
-        Close();
+        bool success = TryOpenEditorWithProject(project);
+        _logger.LogIf(success is false, "Could not open project editor!", LogLevel.Error);
+        // @TODO: throw error if not successful?
     }
 
     private bool CanExit() {
@@ -201,25 +206,37 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
         }
     }
 
-    private void OpenProject() {
-        IProject? selectedProject = DataContext.GetSelectedProject();
-
-        if (!DataContext.CanOpenProject || selectedProject is null) {
-            return;
+    private bool TryOpenEditorWithProject(IProject? project) {
+        if (!DataContext.CanOpenProject || project is null) {
+            return false;
         }
 
-        EditorWindow editorWindow = new(selectedProject, _projectNameValidator, _cancellationTokenSource);
+        EditorWindow editorWindow = new(
+            _logger.CreateChildFromType(typeof(EditorWindow)),
+            project,
+            _projectNameValidator,
+            _cancellationTokenSource
+        );
         editorWindow.Show();
         Close();
+        return true;
     }
 
     private void OpenProjectButton_Click(object sender, RoutedEventArgs e) {
-        OpenProject();
+        bool success = TryOpenEditorWithProject(DataContext.GetSelectedProject());
+        _logger.LogIf(success is false, "Could not open project editor!", LogLevel.Error);
+        // @TODO: throw error if not successful?
     }
 
     private void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+        void openSelectedProject() {
+            bool success = TryOpenEditorWithProject(DataContext.GetSelectedProject());
+            _logger.LogIf(success is false, "Could not open project editor!", LogLevel.Error);
+            // @TODO: throw error if not successful?
+        }
+
         Action action = e.ChangedButton switch {
-            MouseButton.Left => OpenProject,
+            MouseButton.Left => openSelectedProject,
             _ => () => { }
         };
         action();

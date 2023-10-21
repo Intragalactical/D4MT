@@ -12,6 +12,7 @@ using System.Windows;
 namespace D4MT.UI;
 
 public partial class EditorWindow : Window, IViewModelDataContext<IProjectViewModel> {
+    private readonly IDebugLogger _logger;
     private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly ITextValidator _projectNameValidator;
     private LauncherWindow? _launcherWindow;
@@ -29,7 +30,8 @@ public partial class EditorWindow : Window, IViewModelDataContext<IProjectViewMo
         }
     }
 
-    public EditorWindow(IProject project, ITextValidator projectNameValidator, CancellationTokenSource cancellationTokenSource) {
+    public EditorWindow(IDebugLogger logger, IProject project, ITextValidator projectNameValidator, CancellationTokenSource cancellationTokenSource) {
+        _logger = logger;
         _cancellationTokenSource = cancellationTokenSource;
         _projectNameValidator = projectNameValidator;
         DataContext = new ProjectViewModel(project, _projectNameValidator, _cancellationTokenSource.Token);
@@ -66,6 +68,6 @@ public partial class EditorWindow : Window, IViewModelDataContext<IProjectViewMo
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e) {
-
+        _logger.Log($"EditorWindow loaded with project {DataContext.Name}.");
     }
 }

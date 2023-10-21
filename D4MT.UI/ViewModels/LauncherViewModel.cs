@@ -36,7 +36,7 @@ public interface ILauncherViewModel : IViewModel<ILauncherViewModel> {
     bool CanExit { get; }
 
     string GetConfigurationDirectoryPath(ConfigurationDirectory configurationDirectory);
-    void SetConfigurationDirectoryPath(ConfigurationDirectory configurationDirectory, string directoryPath);
+    bool TrySetConfigurationDirectoryPath(ConfigurationDirectory configurationDirectory, string directoryPath);
     IProject? GetSelectedProject();
     bool IsValidConfigurationDirectory(ConfigurationDirectory configurationDirectory);
     bool AreValidConfigurationDirectories(params ConfigurationDirectory[] configurationDirectories);
@@ -188,20 +188,14 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
         };
     }
 
-    public void SetConfigurationDirectoryPath(ConfigurationDirectory configurationDirectory, string directoryPath) {
-        switch (configurationDirectory) {
-            case ConfigurationDirectory.Projects:
-                ProjectsDirectoryPath = directoryPath;
-                break;
-            case ConfigurationDirectory.Game:
-                GameDirectoryPath = directoryPath;
-                break;
-            case ConfigurationDirectory.Mods:
-                ModsDirectoryPath = directoryPath;
-                break;
-            default:
-                throw new UnreachableException("");
-        }
+    public bool TrySetConfigurationDirectoryPath(ConfigurationDirectory configurationDirectory, string directoryPath) {
+        string newDirectoryPath = configurationDirectory switch {
+            ConfigurationDirectory.Projects => ProjectsDirectoryPath = directoryPath,
+            ConfigurationDirectory.Game => GameDirectoryPath = directoryPath,
+            ConfigurationDirectory.Mods => ModsDirectoryPath = directoryPath,
+            _ => throw new UnreachableException("")
+        };
+        return newDirectoryPath.Equals(directoryPath, StringComparison.Ordinal) is true;
     }
 
     private bool IsProjectVisible(object obj) {
