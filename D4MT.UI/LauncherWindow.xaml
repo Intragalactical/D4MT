@@ -244,11 +244,7 @@
                             DefaultBackground="White"
                             Primary="White"
                             Secondary="#EFEFEF" />
-                        <ResourceDictionary x:Key="ListBoxResources">
-                            <ResourceDictionary.MergedDictionaries>
-                                <ResourceDictionary Source="AlternatingListBox.xaml" />
-                            </ResourceDictionary.MergedDictionaries>
-                        </ResourceDictionary>
+                        <ResourceDictionary x:Key="ListBoxResources" Source="AlternatingListBox.xaml" />
                     </ListBox.Resources>
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
