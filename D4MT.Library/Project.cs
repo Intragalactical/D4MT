@@ -98,7 +98,12 @@ public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>
         return options;
     }
 
-    private static async Task<FileStream?> GetReadableFileStreamWhenAccessibleAsync(string filePath, CancellationToken cancellationToken) {
+    private static async Task<FileStream?> GetFileStreamWhenAccessibleAsync(
+        string filePath,
+        FileMode fileMode,
+        FileAccess fileAccess,
+        CancellationToken cancellationToken
+    ) {
         const sbyte SharingViolation = 32;
         const sbyte LockViolation = 33;
 
@@ -111,7 +116,7 @@ public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>
             }
 
             try {
-                fileStream = File.Open(filePath, ReadFileMode, ReadFileAccess);
+                fileStream = File.Open(filePath, fileMode, fileAccess);
                 isAccessible = true;
             } catch (IOException ioException) when ((ioException.HResult & ((1 << 16) - 1)) is SharingViolation or LockViolation) {
                 Debug.WriteLine("Not accessible!");
@@ -124,17 +129,62 @@ public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>
             }
         }
 
-        return isAccessible && fileStream.CanRead ? fileStream : null;
+        bool canPerformNecessaryOperations = fileAccess switch {
+            FileAccess.Read => fileStream.CanRead,
+            FileAccess.Write => fileStream.CanWrite,
+            FileAccess.ReadWrite => fileStream.CanRead && fileStream.CanWrite,
+            _ => throw new UnreachableException("")
+        };
+        return isAccessible && canPerformNecessaryOperations ?
+            fileStream :
+            null;
+    }
+
+    // @TODO: implement timeout so this doesn't get stuck infinitely
+    private static FileStream? GetFileStreamWhenAccessible(string filePath, FileMode fileMode, FileAccess fileAccess) {
+        const sbyte SharingViolation = 32;
+        const sbyte LockViolation = 33;
+
+        bool isAccessible = false;
+        FileStream? fileStream = null;
+
+        while (isAccessible is false || fileStream is null) {
+            try {
+                fileStream = File.Open(filePath, fileMode, fileAccess);
+                isAccessible = true;
+            } catch (IOException ioException) when ((ioException.HResult & ((1 << 16) - 1)) is SharingViolation or LockViolation) {
+                Debug.WriteLine("Not accessible!");
+                isAccessible = false;
+            } finally {
+                if (fileStream is not null && isAccessible is false) {
+                    fileStream.Close();
+                    fileStream.Dispose();
+                }
+            }
+        }
+
+        bool canPerformNecessaryOperations = fileAccess switch {
+            FileAccess.Read => fileStream.CanRead,
+            FileAccess.Write => fileStream.CanWrite,
+            FileAccess.ReadWrite => fileStream.CanRead && fileStream.CanWrite,
+            _ => throw new UnreachableException("")
+        };
+        return isAccessible && canPerformNecessaryOperations ?
+            fileStream :
+            null;
     }
 
     public static async Task<IProject?> DeserializeAsync(string filePath, CancellationToken cancellationToken) {
-        if (cancellationToken.IsCancellationRequested || File.Exists(filePath) is false) {
-            return default;
-        }
-
-        FileStream? fileStream = await GetReadableFileStreamWhenAccessibleAsync(filePath, cancellationToken);
-
-        if (fileStream is null) {
+        if (
+            cancellationToken.IsCancellationRequested ||
+            File.Exists(filePath) is false ||
+            await GetFileStreamWhenAccessibleAsync(
+                filePath,
+                ReadFileMode,
+                ReadFileAccess,
+                cancellationToken
+            ) is not FileStream fileStream
+        ) {
             return null;
         }
 
@@ -149,16 +199,19 @@ public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>
     }
 
     public static IProject? Deserialize(string filePath) {
-        if (File.Exists(filePath) is false) {
-            return default;
+        if (
+            File.Exists(filePath) is false ||
+            GetFileStreamWhenAccessible(filePath, ReadFileMode, ReadFileAccess) is not FileStream fileStream
+        ) {
+            return null;
         }
 
-        using FileStream fileStream = File.Open(filePath, ReadFileMode, ReadFileAccess);
         Project project = JsonSerializer.Deserialize<Project>(
             utf8Json: fileStream,
             options: CreateOptions()
         ) ?? throw ProjectException.CouldNotDeserialize;
         project.FilePath = filePath;
+        fileStream.Dispose();
         return project;
     }
 
@@ -173,14 +226,14 @@ public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>
             projectsDirectoryPath.Any(IsInvalidPathCharacter) || Directory.Exists(projectsDirectoryPath) is false ||
             string.IsNullOrWhiteSpace(projectName) || projectName.Any(IsInvalidPathCharacter) || projectNameValidator.IsValid(projectName) is false
         ) {
-            return default;
+            return null;
         }
 
         string projectDirectoryPath = Path.Combine(projectsDirectoryPath, projectName);
         DirectoryInfo projectDirectoryInfo = Directory.CreateDirectory(projectDirectoryPath);
 
         if (projectDirectoryInfo.Exists is false) {
-            return default;
+            return null;
         }
 
         string projectFilePath = Path.Combine(projectDirectoryPath, Constants.Strings.Patterns.ProjectFileName);
@@ -194,14 +247,14 @@ public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>
             projectsDirectoryPath.Any(IsInvalidPathCharacter) || Directory.Exists(projectsDirectoryPath) is false ||
             string.IsNullOrWhiteSpace(projectName) || projectName.Any(IsInvalidPathCharacter) || projectNameValidator.IsValid(projectName) is false
         ) {
-            return default;
+            return null;
         }
 
         string projectDirectoryPath = Path.Combine(projectsDirectoryPath, projectName);
         DirectoryInfo projectDirectoryInfo = Directory.CreateDirectory(projectDirectoryPath);
 
         if (projectDirectoryInfo.Exists is false) {
-            return default;
+            return null;
         }
 
         string projectFilePath = Path.Combine(projectDirectoryPath, Constants.Strings.Patterns.ProjectFileName);
@@ -211,11 +264,15 @@ public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>
     }
 
     public async Task<bool> TrySaveAsync(CancellationToken cancellationToken) {
-        if (cancellationToken.IsCancellationRequested || string.IsNullOrWhiteSpace(FilePath) || FilePath.Any(IsInvalidPathCharacter)) {
+        if (
+            cancellationToken.IsCancellationRequested ||
+            string.IsNullOrWhiteSpace(FilePath) ||
+            FilePath.Any(IsInvalidPathCharacter) ||
+            await GetFileStreamWhenAccessibleAsync(FilePath, SaveFileMode, SaveFileAccess, cancellationToken) is not FileStream fileStream
+        ) {
             return false;
         }
 
-        FileStream fileStream = File.Open(FilePath, SaveFileMode, SaveFileAccess);
         await JsonSerializer.SerializeAsync(
             utf8Json: fileStream,
             value: this,
@@ -228,17 +285,21 @@ public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>
     }
 
     public bool TrySave() {
-        if (string.IsNullOrWhiteSpace(FilePath) || FilePath.Any(IsInvalidPathCharacter)) {
+        if (
+            string.IsNullOrWhiteSpace(FilePath) ||
+            FilePath.Any(IsInvalidPathCharacter) ||
+            GetFileStreamWhenAccessible(FilePath, SaveFileMode, SaveFileAccess) is not FileStream fileStream
+        ) {
             return false;
         }
 
-        using FileStream fileStream = File.Open(FilePath, SaveFileMode, SaveFileAccess);
         JsonSerializer.Serialize(
             utf8Json: fileStream,
             value: this,
             options: CreateOptions()
         );
         fileStream.Flush();
+        fileStream.Dispose();
         return true;
     }
 

@@ -79,19 +79,31 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
     private string? _projectsDirectoryPath;
     public string ProjectsDirectoryPath {
         get { return _projectsDirectoryPath ?? string.Empty; }
-        set { SetDirectory(ConfigurationDirectory.Projects, value); }
+        set {
+            bool success = TrySetDirectory(ConfigurationDirectory.Projects, value);
+            _logger.LogIf(success is false, $"ConfigurationDirectory {ConfigurationDirectory.Projects} was not set - presumably because it had the same value.");
+            // @TODO: throw on fail?
+        }
     }
 
     private string? _gameDirectoryPath;
     public string GameDirectoryPath {
         get { return _gameDirectoryPath ?? string.Empty; }
-        set { SetDirectory(ConfigurationDirectory.Game, value); }
+        set {
+            bool success = TrySetDirectory(ConfigurationDirectory.Game, value);
+            _logger.LogIf(success is false, $"ConfigurationDirectory {ConfigurationDirectory.Game} was not set - presumably because it had the same value.");
+            // @TODO: throw on fail?
+        }
     }
 
     private string? _modsDirectoryPath;
     public string ModsDirectoryPath {
         get { return _modsDirectoryPath ?? string.Empty; }
-        set { SetDirectory(ConfigurationDirectory.Mods, value); }
+        set {
+            bool success = TrySetDirectory(ConfigurationDirectory.Mods, value);
+            _logger.LogIf(success is false, $"ConfigurationDirectory {ConfigurationDirectory.Mods} was not set - presumably because it had the same value.");
+            // @TODO: throw on fail?
+        }
     }
 
     private string? _projectName = null;
@@ -252,7 +264,7 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
         };
     }
 
-    private void SetDirectory(ConfigurationDirectory configurationDirectory, string newDirectoryPath) {
+    private bool TrySetDirectory(ConfigurationDirectory configurationDirectory, string newDirectoryPath) {
         const StringComparison CaseSensitive = StringComparison.Ordinal;
 
         string? currentConfigurationDirectoryPath = _configuration.GetDirectoryPath(configurationDirectory);
@@ -264,19 +276,20 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
         _saveConfigurationQueue.Enqueue(saveConfigurationTask);
 
         if (currentDirectoryPath?.Equals(newDirectoryPath, CaseSensitive) is true) {
-            return;
+            return false;
         }
 
         if (SetDirectoryPathField(configurationDirectory, newDirectoryPath)?.Equals(newDirectoryPath, CaseSensitive) is not true) {
-            return;
+            return false;
         }
 
         NotifyConfigurationDirectoryChanged(configurationDirectory);
         NotifyPropertiesChanged(this, nameof(CanCreateNewProject), nameof(AreProjectsVisible));
+        return true;
     }
 
     private void EnqueueProjects() {
-        IEnumerable<string> projectFilePaths = _projects.GetProjectFilePaths(ProjectsDirectoryPath);
+        IEnumerable<string> projectFilePaths = _projects.GetFilePaths(ProjectsDirectoryPath);
         _fetchProjectsQueue.Enqueue(_projects.DeserializeAllAsync(projectFilePaths, _cancellationToken));
     }
 

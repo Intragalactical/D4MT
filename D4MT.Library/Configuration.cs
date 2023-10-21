@@ -108,7 +108,7 @@ public sealed class Configuration : IConfiguration, IUnsafeConfiguration, IDeser
 
     public static async Task<IConfiguration?> DeserializeAsync(string filePath, CancellationToken cancellationToken) {
         if (cancellationToken.IsCancellationRequested || IsInvalidFilePath(filePath) || File.Exists(filePath) is false) {
-            return default;
+            return null;
         }
 
         FileStream fileStream = File.Open(filePath, ReadFileMode, ReadFileAccess);
@@ -124,7 +124,7 @@ public sealed class Configuration : IConfiguration, IUnsafeConfiguration, IDeser
 
     public static IConfiguration? Deserialize(string filePath) {
         if (IsInvalidFilePath(filePath) || File.Exists(filePath) is false) {
-            return default;
+            return null;
         }
 
         using FileStream fileStream = File.Open(filePath, ReadFileMode, ReadFileAccess);

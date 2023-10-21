@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 namespace D4MT.Library;
 
 public interface IProjects {
-    IEnumerable<string> GetProjectFilePaths(string parentDirectoryPath);
+    IEnumerable<string> GetFilePaths(string parentDirectoryPath);
     IAsyncEnumerable<IProject> DeserializeAllAsync(IEnumerable<string> projectFilePaths, CancellationToken cancellationToken);
     IProject? GetByName(string parentDirectoryPath, string projectName, ITextValidator projectNameValidator);
     Task<IProject?> GetByNameAsync(string parentDirectoryPath, string projectName, ITextValidator projectNameValidator, CancellationToken cancellationToken);
@@ -20,7 +20,7 @@ public sealed class Projects : IProjects {
         return InvalidPathCharacters.Contains(character);
     }
 
-    public IEnumerable<string> GetProjectFilePaths(string parentDirectoryPath) {
+    public IEnumerable<string> GetFilePaths(string parentDirectoryPath) {
         if (
             string.IsNullOrWhiteSpace(parentDirectoryPath) ||
             parentDirectoryPath.Any(IsInvalidPathCharacter) ||
