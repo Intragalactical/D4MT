@@ -107,25 +107,27 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
         Debug.WriteLine($"Process exited with code {exitCode}. Disposed.");
     }
 
-    private void Window_Loaded(object sender, RoutedEventArgs e) {
-
-    }
-
     private void BrowseProjectsDirectoryButton_Click(object sender, RoutedEventArgs e) {
         const string DialogTitle = "Select D4MT Projects Directory";
-        string initialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        string initialDirectory = string.IsNullOrWhiteSpace(DataContext.ProjectsDirectoryPath) ?
+            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) :
+            DataContext.ProjectsDirectoryPath;
         DataContext.ProjectsDirectoryPath = GetUserSelectedDirectory(DialogTitle, initialDirectory) ?? DataContext.ProjectsDirectoryPath;
     }
 
     private void BrowseGameDirectoryButton_Click(object sender, RoutedEventArgs e) {
         const string DialogTitle = "Select Democracy 4 Game Directory";
-        string initialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+        string initialDirectory = string.IsNullOrWhiteSpace(DataContext.GameDirectoryPath) ?
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) :
+            DataContext.GameDirectoryPath;
         DataContext.GameDirectoryPath = GetUserSelectedDirectory(DialogTitle, initialDirectory) ?? DataContext.GameDirectoryPath;
     }
 
     private void BrowseModsDirectoryButton_Click(object sender, RoutedEventArgs e) {
         const string DialogTitle = "Select Democracy 4 Mods Directory";
-        string initialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        string initialDirectory = string.IsNullOrWhiteSpace(DataContext.ModsDirectoryPath) ?
+            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) :
+            DataContext.ModsDirectoryPath;
         DataContext.ModsDirectoryPath = GetUserSelectedDirectory(DialogTitle, initialDirectory) ?? DataContext.ModsDirectoryPath;
     }
 

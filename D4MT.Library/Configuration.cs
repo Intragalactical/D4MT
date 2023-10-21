@@ -139,7 +139,7 @@ public sealed class Configuration : IConfiguration, IUnsafeConfiguration, IDeser
         string? newPath = configurationDirectory switch {
             ConfigurationDirectory.Projects => ProjectsDirectoryPath = directoryPath,
             ConfigurationDirectory.Game => GameDirectoryPath = directoryPath,
-            ConfigurationDirectory.Mods => ProjectsDirectoryPath = directoryPath,
+            ConfigurationDirectory.Mods => ModsDirectoryPath = directoryPath,
             _ => throw new UnreachableException("")
         };
         return newPath is not null && newPath.Equals(directoryPath, StringComparison.Ordinal) ?
@@ -155,7 +155,7 @@ public sealed class Configuration : IConfiguration, IUnsafeConfiguration, IDeser
         string? newPath = configurationDirectory switch {
             ConfigurationDirectory.Projects => ProjectsDirectoryPath = directoryPath,
             ConfigurationDirectory.Game => GameDirectoryPath = directoryPath,
-            ConfigurationDirectory.Mods => ProjectsDirectoryPath = directoryPath,
+            ConfigurationDirectory.Mods => ModsDirectoryPath = directoryPath,
             _ => throw new UnreachableException("")
         };
         return newPath is not null && newPath.Equals(directoryPath, StringComparison.Ordinal) ?
