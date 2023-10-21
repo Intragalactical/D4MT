@@ -87,7 +87,7 @@
                     <controls:D4MTTextBox x:Name="GameFolderTextBox"
                                           Text="{Binding DataContext.GameDirectoryPath, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           DockPanel.Dock="Left"
-                                          PlaceholderText="Hello world!"
+                                          PlaceholderText="Democracy 4 game directory..."
                                           ToolTip="{Binding DataContext.GameDirectoryPath, ElementName=root, Mode=OneWay}" />
                 </DockPanel>
                 <Label Content="Democracy 4 Mods Directory:"
@@ -102,21 +102,11 @@
                             DockPanel.Dock="Right"
                             Width="60"
                             Margin="5 0 0 0" Click="BrowseModsFolderButton_Click"/>
-                    <TextBox Name="ModsFolderTextBox"
-                             Text="{Binding ModsDirectoryPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             DockPanel.Dock="Left"
-                             VerticalScrollBarVisibility="Disabled"
-                             ToolTip="{Binding ModsDirectoryPath, Mode=OneWay}">
-                        <TextBox.Style>
-                            <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ModsDirectoryPath, Mode=OneWay}" Value="">
-                                        <Setter Property="ToolTipService.IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBox.Style>
-                    </TextBox>
+                    <controls:D4MTTextBox x:Name="ModsFolderTextBox"
+                                          Text="{Binding DataContext.ModsDirectoryPath, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          DockPanel.Dock="Left"
+                                          PlaceholderText="Democracy 4 mods directory..."
+                                          ToolTip="{Binding DataContext.ModsDirectoryPath, ElementName=root, Mode=OneWay}" />
                 </DockPanel>
                 <Label Content="Projects Directory:"
                        Grid.Row="4"
@@ -130,21 +120,11 @@
                             DockPanel.Dock="Right"
                             Width="60"
                             Margin="5 0 0 0" Click="BrowseProjectsFolderButton_Click"/>
-                    <TextBox Name="ProjectsFolderTextBox"
-                             Text="{Binding ProjectsDirectoryPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             DockPanel.Dock="Left"
-                             VerticalScrollBarVisibility="Disabled"
-                             ToolTip="{Binding ProjectsDirectoryPath, Mode=OneWay}">
-                        <TextBox.Resources>
-                            <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ProjectsDirectoryPath, Mode=OneWay}" Value="">
-                                        <Setter Property="ToolTipService.IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBox.Resources>
-                    </TextBox>
+                    <controls:D4MTTextBox x:Name="ProjectsFolderTextBox"
+                                          Text="{Binding DataContext.ProjectsDirectoryPath, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          DockPanel.Dock="Left"
+                                          PlaceholderText="Projects folder..."
+                                          ToolTip="{Binding DataContext.ProjectsDirectoryPath, ElementName=root, Mode=OneWay}" />
                 </DockPanel>
             </Grid>
 
@@ -176,20 +156,10 @@
                     <Label Content="Create Project" FontSize="20" />
                     <StackPanel Orientation="Vertical">
                         <Label Content="Project Name:" />
-                        <TextBox Name="ProjectNameTextBox"
-                                 Text="{Binding ProjectName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 VerticalScrollBarVisibility="Disabled"
-                                 ToolTip="{Binding ProjectName, Mode=OneWay}">
-                            <TextBox.Resources>
-                                <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ProjectName, Mode=OneWay}" Value="">
-                                            <Setter Property="ToolTipService.IsEnabled" Value="False" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                        <controls:D4MTTextBox x:Name="ProjectNameTextBox"
+                                 Text="{Binding DataContext.ProjectName, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 PlaceholderText="Project name..."
+                                 ToolTip="{Binding DataContext.ProjectName, ElementName=root, Mode=OneWay}" />
                     </StackPanel>
                 </StackPanel>
                 <Button VerticalAlignment="Bottom"
