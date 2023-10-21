@@ -22,10 +22,10 @@ namespace D4MT.UI;
 
 public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherViewModel> {
     private readonly IDebugLogger _logger;
-    private readonly CancellationTokenSource _cancellationTokenSource;
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly WindowInteropHelper _windowInteropHelper;
-    private readonly ITextValidator _projectNameValidator;
-    private readonly SynchronizationContext _synchronizationContext;
+    private readonly ITextValidator _projectNameValidator = ProjectNameValidator.Shared;
+    private readonly SynchronizationContext _synchronizationContext = SynchronizationContext.Current ?? throw new Exception("");
 
     public new ILauncherViewModel DataContext {
         get {
@@ -42,8 +42,7 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
 
     public LauncherWindow(IDebugLogger logger) {
         _logger = logger;
-        _projectNameValidator = ProjectNameValidator.Shared;
-        _cancellationTokenSource = new();
+        _windowInteropHelper = new(this);
 
         DataContext = new LauncherViewModel(
             logger.CreateChildFromType(typeof(LauncherViewModel)),
@@ -52,9 +51,6 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
         );
 
         InitializeComponent();
-
-        _synchronizationContext = SynchronizationContext.Current ?? throw new Exception("");
-        _windowInteropHelper = new(this);
     }
 
     private static void OnAggregateExceptionThrow(object? exceptionOrNullObject) {

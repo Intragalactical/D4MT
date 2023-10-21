@@ -34,7 +34,12 @@ public partial class EditorWindow : Window, IViewModelDataContext<IProjectViewMo
         _logger = logger;
         _cancellationTokenSource = cancellationTokenSource;
         _projectNameValidator = projectNameValidator;
-        DataContext = new ProjectViewModel(project, _projectNameValidator, _cancellationTokenSource.Token);
+        DataContext = new ProjectViewModel(
+            logger.CreateChildFromType(typeof(ProjectViewModel)),
+            project,
+            _projectNameValidator,
+            _cancellationTokenSource.Token
+        );
 
         InitializeComponent();
     }

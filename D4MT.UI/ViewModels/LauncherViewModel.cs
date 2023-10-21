@@ -47,29 +47,29 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
     private static readonly SortDescription NameSortDescription = new("HumanFriendlyName", ListSortDirection.Ascending);
 
     private readonly IDebugLogger _logger;
-    private readonly IProjects _projects;
-    private readonly ITextTransformer _projectNameTransformer;
+    private readonly IProjects _projects = Projects.Shared;
+    private readonly ITextTransformer _projectNameTransformer = ProjectNameTransformer.Shared;
     private readonly ITextValidator _projectNameValidator;
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _configuration = Configuration.Deserialize(Constants.Strings.Paths.ConfigurationFile) ?? new Configuration();
     private readonly Task _updateTask;
     private readonly Task _saveConfigurationTask;
     private readonly CancellationToken _cancellationToken;
+    private readonly ObservableCollection<IProject> _foundProjects = new();
 
     #region Queues for update thread
-    private readonly ConcurrentQueue<Task<bool>?> _saveConfigurationQueue;
-    private readonly ConcurrentQueue<IAsyncEnumerable<IProject>> _fetchProjectsQueue;
+    private readonly ConcurrentQueue<Task<bool>?> _saveConfigurationQueue = new();
+    private readonly ConcurrentQueue<IAsyncEnumerable<IProject>> _fetchProjectsQueue = new();
     #endregion
 
     public Guid Id { get; } = Guid.NewGuid();
 
-    private ObservableCollection<IProject> FoundProjects { get; }
     public ICollectionView FoundProjectsView { get; }
 
     private int _selectedProjectIndex = -1;
     public int SelectedProjectIndex {
         get { return _selectedProjectIndex; }
         set {
-            if (_selectedProjectIndex != value && value < FoundProjects.Count) {
+            if (_selectedProjectIndex != value && value < _foundProjects.Count) {
                 _selectedProjectIndex = value;
                 NotifyPropertiesChanged(this, nameof(SelectedProjectIndex), nameof(CanOpenProject));
             }
@@ -152,20 +152,14 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
     }
 
     public LauncherViewModel(IDebugLogger logger, ITextValidator projectNameValidator, CancellationToken cancellationToken) {
-        _cancellationToken = cancellationToken;
-        _logger = logger;
-        _configuration = Configuration.Deserialize(Constants.Strings.Paths.ConfigurationFile) ?? new Configuration();
-
         PropertyChanged += LauncherViewModel_PropertyChanged;
 
-        _projects = Projects.Shared;
-        _projectNameTransformer = ProjectNameTransformer.Shared;
-        _projectNameValidator = projectNameValidator;
-        _saveConfigurationQueue = new();
-        _fetchProjectsQueue = new();
+        _cancellationToken = cancellationToken;
+        _logger = logger;
 
-        FoundProjects = new();
-        FoundProjectsView = CollectionViewSource.GetDefaultView(FoundProjects);
+        _projectNameValidator = projectNameValidator;
+
+        FoundProjectsView = CollectionViewSource.GetDefaultView(_foundProjects);
         FoundProjectsView.SortDescriptions.Add(NameSortDescription);
         FoundProjectsView.Filter = IsProjectVisible;
 
@@ -216,8 +210,8 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
     }
 
     public IProject? GetSelectedProject() {
-        return SelectedProjectIndex is >= 0 || SelectedProjectIndex < FoundProjects.Count ?
-            FoundProjects.ElementAtOrDefault(SelectedProjectIndex) :
+        return SelectedProjectIndex is >= 0 || SelectedProjectIndex < _foundProjects.Count ?
+            _foundProjects.ElementAtOrDefault(SelectedProjectIndex) :
             null;
     }
 
@@ -339,8 +333,8 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
                         .ToBlockingEnumerable(cancellationToken)
                         .ToList(); // ToList is important, since it creates an actual collection from enumeration unlike ToBlockingEnumerable.
                     WpfApplication.Current.Dispatcher.Invoke(() => {
-                        FoundProjects.Clear();
-                        projects.ForEach(FoundProjects.Add);
+                        _foundProjects.Clear();
+                        projects.ForEach(_foundProjects.Add);
                     });
                 }
 

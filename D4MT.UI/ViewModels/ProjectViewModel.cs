@@ -1,5 +1,6 @@
 ﻿using D4MT.Library;
 using D4MT.Library.Common;
+using D4MT.Library.Logging;
 using D4MT.Library.Text;
 using D4MT.UI.Common;
 
@@ -18,12 +19,13 @@ public interface IProjectViewModel : IViewModel<IProjectViewModel> {
 }
 
 public sealed class ProjectViewModel : ViewModel<IProjectViewModel>, IProjectViewModel {
+    private readonly IDebugLogger _logger;
     private readonly CancellationToken _cancellationToken;
     private readonly Task _updateTask;
     private readonly ITextValidator _projectNameValidator;
     private readonly IProject _project;
 
-    private readonly ConcurrentQueue<Task> _projectSaveQueue;
+    private readonly ConcurrentQueue<Task<bool>?> _projectSaveQueue = new();
 
     public Guid Id { get; } = Guid.NewGuid();
 
@@ -45,11 +47,11 @@ public sealed class ProjectViewModel : ViewModel<IProjectViewModel>, IProjectVie
         }
     }
 
-    public ProjectViewModel(IProject project, ITextValidator projectNameValidator, CancellationToken cancellationToken) {
+    public ProjectViewModel(IDebugLogger logger, IProject project, ITextValidator projectNameValidator, CancellationToken cancellationToken) {
+        _logger = logger;
         _cancellationToken = cancellationToken;
         _projectNameValidator = projectNameValidator;
         _project = project;
-        _projectSaveQueue = new();
 
         _updateTask = StartUpdateThread(cancellationToken);
     }
@@ -59,10 +61,12 @@ public sealed class ProjectViewModel : ViewModel<IProjectViewModel>, IProjectVie
             while (_cancellationToken.IsCancellationRequested is false) {
                 while (
                     _cancellationToken.IsCancellationRequested is false &&
-                    _projectSaveQueue.TryDequeue(out Task? projectSaveTask) &&
+                    _projectSaveQueue.TryDequeue(out Task<bool>? projectSaveTask) &&
                     projectSaveTask is { IsCompleted: false }
                 ) {
-                    await projectSaveTask;
+                    bool successs = await projectSaveTask;
+                    _logger.LogIf(successs is false, "Could not save project!", LogLevel.Error);
+                    // @TODO: throw on fail?
                 }
 
                 Thread.Sleep(1000 / 60);
