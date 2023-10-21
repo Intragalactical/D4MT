@@ -281,7 +281,6 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
             _saveConfigurationQueue.TryDequeue(out Task? saveConfigurationTask) &&
             saveConfigurationTask is not null
         ) {
-            Debug.WriteLine("ABCBCB");
             await saveConfigurationTask;
         }
     }
