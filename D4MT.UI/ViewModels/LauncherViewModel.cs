@@ -18,7 +18,7 @@ using System.Windows.Data;
 
 using WpfApplication = System.Windows.Application;
 
-namespace D4MT.UI;
+namespace D4MT.UI.ViewModels;
 
 public interface ILauncherViewModel : IViewModel<ILauncherViewModel> {
     string ProjectFilter { get; set; }

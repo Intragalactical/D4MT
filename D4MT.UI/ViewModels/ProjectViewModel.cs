@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace D4MT.UI;
+namespace D4MT.UI.ViewModels;
 
 public interface IProjectViewModel : IViewModel<IProjectViewModel> {
     string WindowTitle { get; }

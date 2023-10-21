@@ -2,6 +2,7 @@
 using D4MT.Library.Common;
 using D4MT.Library.Text;
 using D4MT.UI.Common;
+using D4MT.UI.ViewModels;
 
 using System;
 using System.Diagnostics;
