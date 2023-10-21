@@ -189,8 +189,8 @@ public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>
 
         string projectFilePath = Path.Combine(projectDirectoryPath, Constants.Strings.Patterns.ProjectFileName);
         IProject project = new Project(projectFilePath);
-        await project.SaveAsync(cancellationToken);
-        return project;
+        bool success = await project.TrySaveAsync(cancellationToken);
+        return success ? project : null;
     }
 
     public static IProject? Create(string projectsDirectoryPath, string projectName, ITextValidator projectNameValidator) {
@@ -210,14 +210,13 @@ public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>
 
         string projectFilePath = Path.Combine(projectDirectoryPath, Constants.Strings.Patterns.ProjectFileName);
         IProject project = new Project(projectFilePath);
-        project.Save();
-        return project;
+        bool success = project.TrySave();
+        return success ? project : null;
     }
 
-    public async Task SaveAsync(CancellationToken cancellationToken) {
-        // @TODO: error when file is null?
+    public async Task<bool> TrySaveAsync(CancellationToken cancellationToken) {
         if (cancellationToken.IsCancellationRequested || string.IsNullOrWhiteSpace(FilePath) || FilePath.Any(IsInvalidPathCharacter)) {
-            return;
+            return false;
         }
 
         FileStream fileStream = File.Open(FilePath, SaveFileMode, SaveFileAccess);
@@ -229,12 +228,12 @@ public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>
         );
         await fileStream.FlushAsync(cancellationToken);
         await fileStream.DisposeAsync();
+        return true;
     }
 
-    public void Save() {
-        // @TODO: error when file is null?
+    public bool TrySave() {
         if (string.IsNullOrWhiteSpace(FilePath) || FilePath.Any(IsInvalidPathCharacter)) {
-            return;
+            return false;
         }
 
         using FileStream fileStream = File.Open(FilePath, SaveFileMode, SaveFileAccess);
@@ -244,6 +243,7 @@ public sealed class Project() : IProject, IUnsafeProject, IDeserialize<IProject>
             options: CreateOptions()
         );
         fileStream.Flush();
+        return true;
     }
 
     public bool TrySetName(string projectName, ITextValidator projectNameValidator) {

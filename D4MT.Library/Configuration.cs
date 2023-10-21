@@ -14,8 +14,8 @@ public interface IConfiguration : ISaveable {
     CultureInfo Language { get; set; }
 
     string? GetDirectoryPath(ConfigurationDirectory configurationDirectory);
-    Action? SetDirectory(ConfigurationDirectory configurationDirectory, string? directoryPath);
-    Task? SetDirectoryAsync(ConfigurationDirectory configurationDirectory, string? directoryPath, CancellationToken cancellationToken);
+    Func<bool>? TrySetDirectory(ConfigurationDirectory configurationDirectory, string? directoryPath);
+    Task<bool>? TrySetDirectoryAsync(ConfigurationDirectory configurationDirectory, string? directoryPath, CancellationToken cancellationToken);
 }
 
 public interface IUnsafeConfiguration {
@@ -75,9 +75,9 @@ public sealed class Configuration : IConfiguration, IUnsafeConfiguration, IDeser
             fileName.Any(IsInvalidFileNameCharacter);
     }
 
-    public async Task SaveAsync(CancellationToken cancellationToken) {
+    public async Task<bool> TrySaveAsync(CancellationToken cancellationToken) {
         if (cancellationToken.IsCancellationRequested || string.IsNullOrWhiteSpace(FilePath) || IsInvalidFilePath(FilePath)) {
-            return;
+            return false;
         }
 
         FileStream fileStream = File.Open(FilePath, SaveFileMode, SaveFileAccess);
@@ -89,11 +89,12 @@ public sealed class Configuration : IConfiguration, IUnsafeConfiguration, IDeser
         );
         await fileStream.FlushAsync(cancellationToken);
         await fileStream.DisposeAsync();
+        return true;
     }
 
-    public void Save() {
+    public bool TrySave() {
         if (string.IsNullOrWhiteSpace(FilePath) || IsInvalidFilePath(FilePath)) {
-            return;
+            return false;
         }
 
         using FileStream fileStream = File.Open(FilePath, SaveFileMode, SaveFileAccess);
@@ -103,6 +104,7 @@ public sealed class Configuration : IConfiguration, IUnsafeConfiguration, IDeser
             options: CreateOptions()
         );
         fileStream.Flush();
+        return true;
     }
 
     public static async Task<IConfiguration?> DeserializeAsync(string filePath, CancellationToken cancellationToken) {
@@ -135,7 +137,7 @@ public sealed class Configuration : IConfiguration, IUnsafeConfiguration, IDeser
         return configuration;
     }
 
-    public Action? SetDirectory(ConfigurationDirectory configurationDirectory, string? directoryPath) {
+    public Func<bool>? TrySetDirectory(ConfigurationDirectory configurationDirectory, string? directoryPath) {
         string? newPath = configurationDirectory switch {
             ConfigurationDirectory.Projects => ProjectsDirectoryPath = directoryPath,
             ConfigurationDirectory.Game => GameDirectoryPath = directoryPath,
@@ -143,11 +145,11 @@ public sealed class Configuration : IConfiguration, IUnsafeConfiguration, IDeser
             _ => throw new UnreachableException("")
         };
         return newPath is not null && newPath.Equals(directoryPath, StringComparison.Ordinal) ?
-            Save :
+            TrySave :
             null;
     }
 
-    public Task? SetDirectoryAsync(ConfigurationDirectory configurationDirectory, string? directoryPath, CancellationToken cancellationToken) {
+    public Task<bool>? TrySetDirectoryAsync(ConfigurationDirectory configurationDirectory, string? directoryPath, CancellationToken cancellationToken) {
         if (cancellationToken.IsCancellationRequested) {
             return null;
         }
@@ -159,7 +161,7 @@ public sealed class Configuration : IConfiguration, IUnsafeConfiguration, IDeser
             _ => throw new UnreachableException("")
         };
         return newPath is not null && newPath.Equals(directoryPath, StringComparison.Ordinal) ?
-            SaveAsync(cancellationToken) :
+            TrySaveAsync(cancellationToken) :
             null;
     }
 

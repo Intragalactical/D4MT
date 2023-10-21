@@ -46,6 +46,7 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
         _cancellationTokenSource = new();
 
         DataContext = new LauncherViewModel(
+            logger.CreateChildFromType(typeof(LauncherViewModel)),
             _projectNameValidator,
             _cancellationTokenSource.Token
         );

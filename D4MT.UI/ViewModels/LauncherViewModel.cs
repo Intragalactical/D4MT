@@ -1,5 +1,6 @@
 ﻿using D4MT.Library;
 using D4MT.Library.Common;
+using D4MT.Library.Logging;
 using D4MT.Library.RegularExpressions;
 using D4MT.Library.Text;
 using D4MT.UI.Common;
@@ -45,6 +46,7 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
     private const sbyte ThreadIdleUpdateFrequencyMilliseconds = 1000 / 60;
     private static readonly SortDescription NameSortDescription = new("HumanFriendlyName", ListSortDirection.Ascending);
 
+    private readonly IDebugLogger _logger;
     private readonly IProjects _projects;
     private readonly ITextTransformer _projectNameTransformer;
     private readonly ITextValidator _projectNameValidator;
@@ -54,7 +56,7 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
     private readonly CancellationToken _cancellationToken;
 
     #region Queues for update thread
-    private readonly ConcurrentQueue<Task?> _saveConfigurationQueue;
+    private readonly ConcurrentQueue<Task<bool>?> _saveConfigurationQueue;
     private readonly ConcurrentQueue<IAsyncEnumerable<IProject>> _fetchProjectsQueue;
     #endregion
 
@@ -149,8 +151,9 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
         }
     }
 
-    public LauncherViewModel(ITextValidator projectNameValidator, CancellationToken cancellationToken) {
+    public LauncherViewModel(IDebugLogger logger, ITextValidator projectNameValidator, CancellationToken cancellationToken) {
         _cancellationToken = cancellationToken;
+        _logger = logger;
         _configuration = Configuration.Deserialize(Constants.Strings.Paths.ConfigurationFile) ?? new Configuration();
 
         PropertyChanged += LauncherViewModel_PropertyChanged;
@@ -172,6 +175,8 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
 
         _updateTask = StartUpdateTask(cancellationToken);
         _saveConfigurationTask = SaveConfiguration(cancellationToken);
+
+        _logger.Log("LauncherViewModel constructed.");
     }
 
     public string GetConfigurationDirectoryPath(ConfigurationDirectory configurationDirectory) {
@@ -265,8 +270,8 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
         string? currentConfigurationDirectoryPath = _configuration.GetDirectoryPath(configurationDirectory);
         string? currentDirectoryPath = GetDirectoryPath(configurationDirectory);
 
-        Task? saveConfigurationTask = currentConfigurationDirectoryPath?.Equals(newDirectoryPath, CaseSensitive) is not true ?
-            _configuration.SetDirectoryAsync(configurationDirectory, newDirectoryPath, _cancellationToken) :
+        Task<bool>? saveConfigurationTask = currentConfigurationDirectoryPath?.Equals(newDirectoryPath, CaseSensitive) is not true ?
+            _configuration.TrySetDirectoryAsync(configurationDirectory, newDirectoryPath, _cancellationToken) :
             null;
         _saveConfigurationQueue.Enqueue(saveConfigurationTask);
 
@@ -305,10 +310,11 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
         bool respectCancellationToken = cancellationToken.Equals(CancellationToken.None);
         while (
             (respectCancellationToken is false || cancellationToken.IsCancellationRequested is false) &&
-            _saveConfigurationQueue.TryDequeue(out Task? saveConfigurationTask) &&
+            _saveConfigurationQueue.TryDequeue(out Task<bool>? saveConfigurationTask) &&
             saveConfigurationTask is not null
         ) {
-            await saveConfigurationTask;
+            bool success = await saveConfigurationTask;
+            _logger.LogIf(success is false, "Could not save configuration!", LogLevel.Error);
         }
     }
 
