@@ -86,7 +86,6 @@ public partial class D4MTTextBox : UserControl, INotifyPropertyChanged {
 
     private Brush _placeholderForeground = Brushes.DimGray;
     public Brush PlaceholderForeground {
-        aa
         get { return _placeholderForeground; }
         set {
             if (_placeholderForeground.Equals(value) is false) {
