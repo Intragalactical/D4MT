@@ -119,33 +119,8 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
         return $"Select {part} Directory";
     }
 
-    private string GetConfigurationDirectoryPath(ConfigurationDirectory configurationDirectory) {
-        return configurationDirectory switch {
-            ConfigurationDirectory.Projects => DataContext.ProjectsDirectoryPath,
-            ConfigurationDirectory.Game => DataContext.GameDirectoryPath,
-            ConfigurationDirectory.Mods => DataContext.ModsDirectoryPath,
-            _ => throw new UnreachableException("")
-        };
-    }
-
-    private void SetConfigurationDirectoryPath(ConfigurationDirectory configurationDirectory, string directoryPath) {
-        switch (configurationDirectory) {
-            case ConfigurationDirectory.Projects:
-                DataContext.ProjectsDirectoryPath = directoryPath;
-                break;
-            case ConfigurationDirectory.Game:
-                DataContext.GameDirectoryPath = directoryPath;
-                break;
-            case ConfigurationDirectory.Mods:
-                DataContext.ModsDirectoryPath = directoryPath;
-                break;
-            default:
-                throw new UnreachableException("");
-        }
-    }
-
     private string GetFolderBrowserDialogInitialDirectory(ConfigurationDirectory configurationDirectory) {
-        string configurationDirectoryPath = GetConfigurationDirectoryPath(configurationDirectory);
+        string configurationDirectoryPath = DataContext.GetConfigurationDirectoryPath(configurationDirectory);
         Environment.SpecialFolder defaultDirectory = configurationDirectory switch {
             ConfigurationDirectory.Projects => Environment.SpecialFolder.MyDocuments,
             ConfigurationDirectory.Game => Environment.SpecialFolder.ProgramFilesX86,
@@ -172,8 +147,8 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
             GetUserSelectedDirectory(
                 GetFolderBrowserDialogTitle(configurationDirectory),
                 GetFolderBrowserDialogInitialDirectory(configurationDirectory)
-            ) ?? GetConfigurationDirectoryPath(configurationDirectory);
-        SetConfigurationDirectoryPath(configurationDirectory, directoryPath);
+            ) ?? DataContext.GetConfigurationDirectoryPath(configurationDirectory);
+        DataContext.SetConfigurationDirectoryPath(configurationDirectory, directoryPath);
     }
 
     private async void CreateProjectButton_Click(object sender, RoutedEventArgs e) {

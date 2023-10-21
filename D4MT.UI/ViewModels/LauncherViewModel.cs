@@ -34,6 +34,8 @@ public interface ILauncherViewModel : IViewModel<ILauncherViewModel> {
     int SelectedProjectIndex { get; }
     bool CanExit { get; }
 
+    string GetConfigurationDirectoryPath(ConfigurationDirectory configurationDirectory);
+    void SetConfigurationDirectoryPath(ConfigurationDirectory configurationDirectory, string directoryPath);
     IProject? GetSelectedProject();
     bool IsValidConfigurationDirectory(ConfigurationDirectory configurationDirectory);
     bool AreValidConfigurationDirectories(params ConfigurationDirectory[] configurationDirectories);
@@ -170,6 +172,31 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
 
         _updateTask = StartUpdateTask(cancellationToken);
         _saveConfigurationTask = SaveConfiguration(cancellationToken);
+    }
+
+    public string GetConfigurationDirectoryPath(ConfigurationDirectory configurationDirectory) {
+        return configurationDirectory switch {
+            ConfigurationDirectory.Projects => ProjectsDirectoryPath,
+            ConfigurationDirectory.Game => GameDirectoryPath,
+            ConfigurationDirectory.Mods => ModsDirectoryPath,
+            _ => throw new UnreachableException("")
+        };
+    }
+
+    public void SetConfigurationDirectoryPath(ConfigurationDirectory configurationDirectory, string directoryPath) {
+        switch (configurationDirectory) {
+            case ConfigurationDirectory.Projects:
+                ProjectsDirectoryPath = directoryPath;
+                break;
+            case ConfigurationDirectory.Game:
+                GameDirectoryPath = directoryPath;
+                break;
+            case ConfigurationDirectory.Mods:
+                ModsDirectoryPath = directoryPath;
+                break;
+            default:
+                throw new UnreachableException("");
+        }
     }
 
     private bool IsProjectVisible(object obj) {
