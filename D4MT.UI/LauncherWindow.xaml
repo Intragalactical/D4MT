@@ -83,7 +83,8 @@
                             Content="Browse..."
                             DockPanel.Dock="Right"
                             Width="60"
-                            Margin="5 0 0 0" Click="BrowseGameDirectoryButton_Click"/>
+                            Margin="5 0 0 0"
+                            Click="OnBrowseConfigurationDirectoryButtonClick"/>
                     <controls:D4MTTextBox x:Name="GameDirectoryTextBox"
                                           Text="{Binding DataContext.GameDirectoryPath, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           DockPanel.Dock="Left"
@@ -101,7 +102,8 @@
                             Content="Browse..."
                             DockPanel.Dock="Right"
                             Width="60"
-                            Margin="5 0 0 0" Click="BrowseModsDirectoryButton_Click"/>
+                            Margin="5 0 0 0"
+                            Click="OnBrowseConfigurationDirectoryButtonClick"/>
                     <controls:D4MTTextBox x:Name="ModsDirectoryTextBox"
                                           Text="{Binding DataContext.ModsDirectoryPath, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           DockPanel.Dock="Left"
@@ -119,7 +121,8 @@
                             Content="Browse..."
                             DockPanel.Dock="Right"
                             Width="60"
-                            Margin="5 0 0 0" Click="BrowseProjectsDirectoryButton_Click"/>
+                            Margin="5 0 0 0"
+                            Click="OnBrowseConfigurationDirectoryButtonClick"/>
                     <controls:D4MTTextBox x:Name="ProjectsDirectoryTextBox"
                                           Text="{Binding DataContext.ProjectsDirectoryPath, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           DockPanel.Dock="Left"

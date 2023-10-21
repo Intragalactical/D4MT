@@ -11,6 +11,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 
@@ -111,28 +112,71 @@ public partial class LauncherWindow : Window, IViewModelDataContext<ILauncherVie
         logger.Log($"Process exited with code {exitCode}. Disposed.");
     }
 
-    private void BrowseProjectsDirectoryButton_Click(object sender, RoutedEventArgs e) {
-        const string DialogTitle = "Select D4MT Projects Directory";
-        string initialDirectory = string.IsNullOrWhiteSpace(DataContext.ProjectsDirectoryPath) is false && Directory.Exists(DataContext.ProjectsDirectoryPath) ?
-            DataContext.ProjectsDirectoryPath :
-            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        DataContext.ProjectsDirectoryPath = GetUserSelectedDirectory(DialogTitle, initialDirectory) ?? DataContext.ProjectsDirectoryPath;
+    private static string GetFolderBrowserDialogTitle(ConfigurationDirectory configurationDirectory) {
+        string part = configurationDirectory switch {
+            ConfigurationDirectory.Projects => "D4MT Projects",
+            ConfigurationDirectory.Game => "Democracy 4 Game",
+            ConfigurationDirectory.Mods => "Democracy 4 Mods",
+            _ => throw new UnreachableException("")
+        };
+        return $"Select {part} Directory";
     }
 
-    private void BrowseGameDirectoryButton_Click(object sender, RoutedEventArgs e) {
-        const string DialogTitle = "Select Democracy 4 Game Directory";
-        string initialDirectory = string.IsNullOrWhiteSpace(DataContext.GameDirectoryPath) is false && Directory.Exists(DataContext.GameDirectoryPath) ?
-            DataContext.GameDirectoryPath :
-            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-        DataContext.GameDirectoryPath = GetUserSelectedDirectory(DialogTitle, initialDirectory) ?? DataContext.GameDirectoryPath;
+    private string GetConfigurationDirectoryPath(ConfigurationDirectory configurationDirectory) {
+        return configurationDirectory switch {
+            ConfigurationDirectory.Projects => DataContext.ProjectsDirectoryPath,
+            ConfigurationDirectory.Game => DataContext.GameDirectoryPath,
+            ConfigurationDirectory.Mods => DataContext.ModsDirectoryPath,
+            _ => throw new UnreachableException("")
+        };
     }
 
-    private void BrowseModsDirectoryButton_Click(object sender, RoutedEventArgs e) {
-        const string DialogTitle = "Select Democracy 4 Mods Directory";
-        string initialDirectory = string.IsNullOrWhiteSpace(DataContext.ModsDirectoryPath) is false && Directory.Exists(DataContext.ModsDirectoryPath) ?
-            DataContext.ModsDirectoryPath :
-            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        DataContext.ModsDirectoryPath = GetUserSelectedDirectory(DialogTitle, initialDirectory) ?? DataContext.ModsDirectoryPath;
+    private void SetConfigurationDirectoryPath(ConfigurationDirectory configurationDirectory, string directoryPath) {
+        switch (configurationDirectory) {
+            case ConfigurationDirectory.Projects:
+                DataContext.ProjectsDirectoryPath = directoryPath;
+                break;
+            case ConfigurationDirectory.Game:
+                DataContext.GameDirectoryPath = directoryPath;
+                break;
+            case ConfigurationDirectory.Mods:
+                DataContext.ModsDirectoryPath = directoryPath;
+                break;
+            default:
+                throw new UnreachableException("");
+        }
+    }
+
+    private string GetFolderBrowserDialogInitialDirectory(ConfigurationDirectory configurationDirectory) {
+        string configurationDirectoryPath = GetConfigurationDirectoryPath(configurationDirectory);
+        Environment.SpecialFolder defaultDirectory = configurationDirectory switch {
+            ConfigurationDirectory.Projects => Environment.SpecialFolder.MyDocuments,
+            ConfigurationDirectory.Game => Environment.SpecialFolder.ProgramFilesX86,
+            ConfigurationDirectory.Mods => Environment.SpecialFolder.MyDocuments,
+            _ => throw new UnreachableException("")
+        };
+        return string.IsNullOrWhiteSpace(configurationDirectoryPath) is false && Directory.Exists(configurationDirectoryPath) ?
+            configurationDirectoryPath :
+            Environment.GetFolderPath(defaultDirectory);
+    }
+
+    private void OnBrowseConfigurationDirectoryButtonClick(object sender, RoutedEventArgs e) {
+        if (sender is not Button button) {
+            return;
+        }
+
+        ConfigurationDirectory configurationDirectory = button.Name switch {
+            nameof(BrowseGameDirectoryButton) => ConfigurationDirectory.Game,
+            nameof(BrowseModsDirectoryButton) => ConfigurationDirectory.Mods,
+            nameof(BrowseProjectsDirectoryButton) => ConfigurationDirectory.Projects,
+            _ => throw new Exception("")
+        };
+        string directoryPath =
+            GetUserSelectedDirectory(
+                GetFolderBrowserDialogTitle(configurationDirectory),
+                GetFolderBrowserDialogInitialDirectory(configurationDirectory)
+            ) ?? GetConfigurationDirectoryPath(configurationDirectory);
+        SetConfigurationDirectoryPath(configurationDirectory, directoryPath);
     }
 
     private async void CreateProjectButton_Click(object sender, RoutedEventArgs e) {
