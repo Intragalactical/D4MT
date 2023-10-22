@@ -153,78 +153,87 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="20" />
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-                <Label Content="Create Project" FontSize="20" Grid.Column="0" Grid.Row="0" />
-                <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="1">
-                    <Label Content="Project Name:" />
-                    <controls:D4MTTextBox x:Name="ProjectNameTextBox"
-                                 Text="{Binding DataContext.ProjectName, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 PlaceholderText="Project name..."
-                                 ToolTip="{Binding DataContext.ProjectName, ElementName=root, Mode=OneWay}" />
-                </StackPanel>
-                <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="2">
-                        <StackPanel Orientation="Horizontal">
-                            <Label Content="Mod Name:" />
-                            <CheckBox
-                                    VerticalAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    IsChecked="{Binding SynchronizeModNameWithProjectName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Content="Synchronize with Project Name"
-                                />
-                        </StackPanel>
-                        <controls:D4MTTextBox x:Name="ModNameTextBox"
-                                 Text="{Binding DataContext.ModName, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 PlaceholderText="Mod name..."
-                                 IsPlaceholderEnabled="{Binding DataContext.SynchronizeModNameWithProjectName, ElementName=root, Mode=OneWay, Converter={StaticResource ReverseBooleanConverter}}"
-                                 IsEnabled="{Binding DataContext.SynchronizeModNameWithProjectName, ElementName=root, Mode=OneWay, Converter={StaticResource ReverseBooleanConverter}}"
-                                 ToolTip="{Binding DataContext.ModName, ElementName=root, Mode=OneWay}" />
-                    </StackPanel>
-                <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="3">
-                        <Label Content="Visible Name:" />
-                        <controls:D4MTTextBox x:Name="VisibleNameTextBox"
-                                 Text="{Binding DataContext.VisibleName, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 PlaceholderText="Visible name..."
-                                 ToolTip="{Binding DataContext.VisibleName, ElementName=root, Mode=OneWay}" />
-                    </StackPanel>
-                <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="4">
-                        <Label Content="Author:" />
-                        <controls:D4MTTextBox x:Name="AuthorTextBox"
-                                 Text="{Binding DataContext.Author, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 PlaceholderText="Author..."
-                                 ToolTip="{Binding DataContext.Author, ElementName=root, Mode=OneWay}" />
-                    </StackPanel>
-                <Grid Grid.Column="0" Grid.Row="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="0 0 10 0" Grid.Column="0" Grid.Row="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
 
-                    <Label Content="Description:" Grid.Column="0" Grid.Row="0" />
-                    <controls:D4MTTextBox x:Name="DescriptionTextBox"
-                                          Grid.Column="0"
-                                          Grid.Row="1"
-                                          TextWrapping="Wrap"
-                                          VerticalTextAlignment="Top"
-                                          Text="{Binding DataContext.Description, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          PlaceholderText="Description..."
-                                          VerticalScrollBarVisibility="Visible"
-                                          ToolTip="{Binding DataContext.Description, ElementName=root, Mode=OneWay}" />
-                </Grid>
+                        <Label Content="Create Project" FontSize="20" Grid.Column="0" Grid.Row="0" />
+                        <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="1">
+                            <Label Content="Project Name:" />
+                            <controls:D4MTTextBox x:Name="ProjectNameTextBox"
+                                                  Text="{Binding DataContext.ProjectName, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  PlaceholderText="Project name..."
+                                                  ToolTip="{Binding DataContext.ProjectName, ElementName=root, Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="2">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Mod Name:" />
+                                <CheckBox VerticalAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          IsChecked="{Binding SynchronizeModNameWithProjectName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          Content="Synchronize with Project Name" />
+                            </StackPanel>
+                            <controls:D4MTTextBox x:Name="ModNameTextBox"
+                                                  Text="{Binding DataContext.ModName, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  PlaceholderText="Mod name..."
+                                                  IsPlaceholderEnabled="{Binding DataContext.SynchronizeModNameWithProjectName, ElementName=root, Mode=OneWay, Converter={StaticResource ReverseBooleanConverter}}"
+                                                  IsEnabled="{Binding DataContext.SynchronizeModNameWithProjectName, ElementName=root, Mode=OneWay, Converter={StaticResource ReverseBooleanConverter}}"
+                                                  ToolTip="{Binding DataContext.ModName, ElementName=root, Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="3">
+                            <Label Content="Visible Name:" />
+                            <controls:D4MTTextBox x:Name="VisibleNameTextBox"
+                                                  Text="{Binding DataContext.VisibleName, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  PlaceholderText="Visible name..."
+                                                  ToolTip="{Binding DataContext.VisibleName, ElementName=root, Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="4">
+                            <Label Content="Author:" />
+                            <controls:D4MTTextBox x:Name="AuthorTextBox"
+                                                  Text="{Binding DataContext.Author, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  PlaceholderText="Author..."
+                                                  ToolTip="{Binding DataContext.Author, ElementName=root, Mode=OneWay}" />
+                        </StackPanel>
+                        <Grid Grid.Column="0" Grid.Row="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Label Content="Description:" Grid.Column="0" Grid.Row="0" />
+                            <controls:D4MTTextBox x:Name="DescriptionTextBox"
+                                                  Grid.Column="0"
+                                                  Grid.Row="1"
+                                                  TextWrapping="Wrap"
+                                                  VerticalTextAlignment="Top"
+                                                  Text="{Binding DataContext.Description, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  PlaceholderText="Description..."
+                                                  VerticalScrollBarVisibility="Visible"
+                                                  ToolTip="{Binding DataContext.Description, ElementName=root, Mode=OneWay}" />
+                        </Grid>
+                    </Grid>
+                </ScrollViewer>
                 <Button VerticalAlignment="Bottom"
                         Name="CreateProjectButton"
                         Content="Create"
-                        Grid.Row="7"
+                        Grid.Row="2"
                         Grid.Column="0"
                         IsEnabled="{Binding CanCreateNewProject, Mode=OneWay}"
                         Click="CreateProjectButton_Click" />
@@ -241,8 +250,6 @@
                   Grid.Column="3"
                   IsEnabled="{Binding AreProjectsVisible, Mode=OneWay}">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="20" />
                     <RowDefinition Height="auto" />
@@ -251,56 +258,68 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Label Content="Open Project"
-                       FontSize="20"
-                       Grid.Row="0"
-                       Grid.Column="0" />
-                <controls:D4MTTextBox Grid.Row="1"
-                                      Grid.Column="0"
-                                      Text="{Binding DataContext.ProjectFilter, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      PlaceholderText="Filter projects..."
-                                      ToolTip="{Binding DataContext.ProjectFilter, ElementName=root, Mode=OneWay}" />
-                <controls:D4MTListBox x:Name="ModsListBox"
-                                      Margin="0 10 0 0"
-                                      Grid.Row="2"
-                                      Grid.Column="0"
-                                      Padding="4 2 4 0"
-                                      SelectionMode="Single"
-                                      ItemDoubleClick="ListBoxItem_MouseDoubleClick"
-                                      SelectedIndex="{Binding DataContext.SelectedProjectIndex, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      IsSynchronizedWithCurrentItem="True"
-                                      VerticalScrollBarVisibility="Visible"
-                                      HorizontalScrollBarVisibility="Disabled"
-                                      ItemsSource="{Binding DataContext.FoundProjectsView, ElementName=root, Mode=OneWay}">
-                    <controls:D4MTListBox.ItemContextMenu>
-                        <controls:D4MTContextMenu>
-                            <MenuItem Header="Open in Explorer..." Click="MenuItem_Click" />
-                            <Separator />
-                            <MenuItem Header="Close" />
-                        </controls:D4MTContextMenu>
-                    </controls:D4MTListBox.ItemContextMenu>
-                    <controls:D4MTListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Vertical" Background="Transparent">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding HumanFriendlyName, Mode=OneWay}"
-                                               FontSize="13px"
-                                               TextTrimming="CharacterEllipsis"
-                                               ToolTip="{Binding HumanFriendlyName, Mode=OneWay}"/>
-                                </StackPanel>
-                                <TextBlock Text="{Binding HumanFriendlyDirectoryPath, Mode=OneWay}"
-                                           FontSize="11px"
-                                           TextTrimming="CharacterEllipsis"
-                                           ToolTip="{Binding HumanFriendlyDirectoryPath, Mode=OneWay}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </controls:D4MTListBox.ItemTemplate>
-                </controls:D4MTListBox>
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="10 0 0 0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Label Content="Open Project"
+                               FontSize="20"
+                               Grid.Row="0"
+                               Grid.Column="0" />
+                        <controls:D4MTTextBox Grid.Row="1"
+                                              Grid.Column="0"
+                                              Text="{Binding DataContext.ProjectFilter, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              PlaceholderText="Filter projects..."
+                                              ToolTip="{Binding DataContext.ProjectFilter, ElementName=root, Mode=OneWay}" />
+                        <controls:D4MTListBox x:Name="ModsListBox"
+                                              Margin="0 10 0 0"
+                                              Grid.Row="2"
+                                              Grid.Column="0"
+                                              Padding="4 2 4 0"
+                                              SelectionMode="Single"
+                                              ItemDoubleClick="ListBoxItem_MouseDoubleClick"
+                                              SelectedIndex="{Binding DataContext.SelectedProjectIndex, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              IsSynchronizedWithCurrentItem="True"
+                                              VerticalScrollBarVisibility="Visible"
+                                              HorizontalScrollBarVisibility="Disabled"
+                                              ItemsSource="{Binding DataContext.FoundProjectsView, ElementName=root, Mode=OneWay}">
+                            <controls:D4MTListBox.ItemContextMenu>
+                                <controls:D4MTContextMenu>
+                                    <MenuItem Header="Open in Explorer..." Click="MenuItem_Click" />
+                                    <Separator />
+                                    <MenuItem Header="Close" />
+                                </controls:D4MTContextMenu>
+                            </controls:D4MTListBox.ItemContextMenu>
+                            <controls:D4MTListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Vertical" Background="Transparent">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding HumanFriendlyName, Mode=OneWay}"
+                                                       FontSize="13px"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       ToolTip="{Binding HumanFriendlyName, Mode=OneWay}"/>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding HumanFriendlyDirectoryPath, Mode=OneWay}"
+                                                   FontSize="11px"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   ToolTip="{Binding HumanFriendlyDirectoryPath, Mode=OneWay}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </controls:D4MTListBox.ItemTemplate>
+                        </controls:D4MTListBox>
+                    </Grid>
+                </ScrollViewer>
                 <Button Name="OpenProjectButton"
                         Content="Open"
                         IsEnabled="{Binding CanOpenProject, Mode=OneWay}"
                         Click="OpenProjectButton_Click"
-                        Grid.Row="4"
+                        Grid.Row="2"
                         Grid.Column="0" />
             </Grid>
         </Grid>

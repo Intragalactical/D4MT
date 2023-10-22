@@ -33,7 +33,6 @@
                  ToolTipService.IsEnabled="False"
                  AcceptsReturn="{Binding TextWrapping, ElementName=root, Mode=OneWay, Converter={StaticResource TextWrappingToAcceptsReturnConverter}}"
                  TextWrapping="{Binding TextWrapping, ElementName=root, Mode=OneWay}"
-                 Height="{Binding ActualHeight, ElementName=root, Mode=OneWay}"
                  GotFocus="UserControlTextBox_GotFocus">
             <TextBox.Style>
                 <Style TargetType="TextBox">
