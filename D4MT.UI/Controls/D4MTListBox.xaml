@@ -1,0 +1,70 @@
+﻿<UserControl x:Class="D4MT.UI.Controls.D4MTListBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converters="clr-namespace:D4MT.UI.Converters"
+             mc:Ignorable="d"
+             x:Name="root"
+             Padding="0 0 0 0"
+             d:DesignHeight="450"
+             d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:AlternationIndexToUsePrimaryConverter x:Key="AlternationIndexToUsePrimaryConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <ListBox Name="UserControlListBox"
+                 Padding="{Binding Padding, ElementName=root, Mode=OneWay}"
+                 SelectionMode="{Binding SelectionMode, ElementName=root, Mode=OneWay}"
+                 SelectedIndex="{Binding SelectedIndex, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 IsSynchronizedWithCurrentItem="{Binding IsSynchronizedWithCurrentItem, ElementName=root, Mode=OneWay}"
+                 ScrollViewer.VerticalScrollBarVisibility="{Binding VerticalScrollBarVisibility, ElementName=root, Mode=OneWay}"
+                 ScrollViewer.HorizontalScrollBarVisibility="{Binding HorizontalScrollBarVisibility, ElementName=root, Mode=OneWay}"
+                 ItemsSource="{Binding ItemsSource, ElementName=root, Mode=OneWay}"
+                 AlternationCount="{Binding ItemsSource.Count, ElementName=root, Mode=OneWay}"
+                 ItemTemplate="{Binding ItemTemplate, ElementName=root, Mode=OneWay}">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <EventSetter Event="MouseDoubleClick" Handler="ListBoxItem_MouseDoubleClick" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border Padding="{Binding ItemPadding, ElementName=root, Mode=OneWay}"
+                                        x:Name="ListBoxItemBorder"
+                                        ContextMenu="{Binding ItemContextMenu, ElementName=root, Mode=OneWay}">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="{Binding ItemHoverBackground, ElementName=root, Mode=OneWay}" />
+                                                </Trigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsMouseOver, ElementName=ListBoxItemBorder, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=(ItemsControl.AlternationIndex), Mode=OneWay, Converter={StaticResource AlternationIndexToUsePrimaryConverter}}" Value="True" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Background" Value="{Binding AlternationPrimaryBackground, ElementName=root, Mode=OneWay}" />
+                                                </MultiDataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsMouseOver, ElementName=ListBoxItemBorder, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=(ItemsControl.AlternationIndex), Mode=OneWay, Converter={StaticResource AlternationIndexToUsePrimaryConverter}}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Background" Value="{Binding AlternationSecondaryBackground, ElementName=root, Mode=OneWay}" />
+                                                </MultiDataTrigger>
+                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem, AncestorLevel=1}, Path=IsSelected}" Value="True">
+                                                    <Setter Property="Background" Value="{Binding ItemSelectedBackground, ElementName=root, Mode=OneWay}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <ContentPresenter />
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
+    </Grid>
+</UserControl>

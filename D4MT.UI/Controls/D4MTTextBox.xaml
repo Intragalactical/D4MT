@@ -36,6 +36,9 @@
                         <DataTrigger Binding="{Binding ShowPlaceholder, Mode=OneWay}" Value="True">
                             <Setter Property="Background" Value="{StaticResource PlaceholderBrush}" />
                         </DataTrigger>
+                        <DataTrigger Binding="{Binding IsEnabled, ElementName=root, Mode=OneWay}" Value="False">
+                            <Setter Property="Background" Value="{Binding DisabledBackground, Mode=OneWay}" />
+                        </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </TextBox.Style>

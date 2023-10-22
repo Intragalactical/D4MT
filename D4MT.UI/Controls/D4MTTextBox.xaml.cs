@@ -14,8 +14,31 @@ public partial class D4MTTextBox : UserControl, INotifyPropertyChanged {
             typeof(string),
             typeof(D4MTTextBox)
         );
+    public static readonly DependencyProperty DisabledBackgroundProperty =
+        DependencyProperty.Register(
+            nameof(DisabledBackground),
+            typeof(Brush),
+            typeof(D4MTTextBox),
+            new(Brushes.LightGray)
+        );
+    public static readonly DependencyProperty PlaceholderForegroundProperty =
+        DependencyProperty.Register(
+            nameof(PlaceholderForeground),
+            typeof(Brush),
+            typeof(D4MTTextBox),
+            new(Brushes.LightGray)
+        );
+    public static readonly DependencyProperty IsPlaceholderEnabledProperty =
+        DependencyProperty.Register(
+            nameof(IsPlaceholderEnabled),
+            typeof(bool),
+            typeof(D4MTTextBox),
+            new(true, OnIsPlaceholderEnabledChanged)
+        );
 
+    public event TextChangedEventHandler? TextChanged;
     public event PropertyChangedEventHandler? PropertyChanged;
+
 
     private AlignmentX _placeholderHorizontalAlignment = AlignmentX.Left;
     public AlignmentX PlaceholderHorizontalAlignment {
@@ -69,30 +92,26 @@ public partial class D4MTTextBox : UserControl, INotifyPropertyChanged {
         }
     }
 
-    private bool _isPlaceholderEnabled = true;
     public bool IsPlaceholderEnabled {
-        get { return _isPlaceholderEnabled; }
+        get { return (bool)GetValue(IsPlaceholderEnabledProperty); }
         set {
-            if (_isPlaceholderEnabled.Equals(value) is false) {
-                _isPlaceholderEnabled = value;
-                NotifyPropertyChanged();
-            }
+            SetValue(IsPlaceholderEnabledProperty, value);
+            NotifyPropertyChanged();
         }
     }
 
     public bool ShowPlaceholder {
-        get { return _isPlaceholderEnabled && IsTextBoxFocused is false && string.IsNullOrWhiteSpace(Text); }
+        get { return IsPlaceholderEnabled && IsTextBoxFocused is false && string.IsNullOrWhiteSpace(Text); }
     }
 
-    private Brush _placeholderForeground = Brushes.DimGray;
     public Brush PlaceholderForeground {
-        get { return _placeholderForeground; }
-        set {
-            if (_placeholderForeground.Equals(value) is false) {
-                _placeholderForeground = value;
-                NotifyPropertyChanged();
-            }
-        }
+        get { return (Brush)GetValue(PlaceholderForegroundProperty); }
+        set { SetValue(PlaceholderForegroundProperty, value); }
+    }
+
+    public Brush DisabledBackground {
+        get { return (Brush)GetValue(DisabledBackgroundProperty); }
+        set { SetValue(DisabledBackgroundProperty, value); }
     }
 
     private string? _placeholderText;
@@ -129,13 +148,22 @@ public partial class D4MTTextBox : UserControl, INotifyPropertyChanged {
         DataContext = this;
     }
 
+    private static void OnIsPlaceholderEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+        if (d is not D4MTTextBox d4mtTextBox) {
+            return;
+        }
+
+        d4mtTextBox.UpdateShowPlaceholder();
+    }
+
+    private void UpdateShowPlaceholder() {
+        NotifyPropertyChanged(nameof(ShowPlaceholder));
+    }
+
     private void D4MTTextBox_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         switch (e.PropertyName) {
             case nameof(DisableToolTipWhenNoText):
                 NotifyPropertyChanged(nameof(IsToolTipEnabled));
-                break;
-            case nameof(IsPlaceholderEnabled):
-                NotifyPropertyChanged(nameof(ShowPlaceholder));
                 break;
             case nameof(IsTextBoxFocused):
                 NotifyPropertyChanged(nameof(ShowPlaceholder));
@@ -174,6 +202,7 @@ public partial class D4MTTextBox : UserControl, INotifyPropertyChanged {
 
     private void UserControlTextBox_TextChanged(object sender, TextChangedEventArgs e) {
         Text = UserControlTextBox.Text;
+        TextChanged?.Invoke(this, e);
     }
 
     private void UserControlTextBox_LostFocus(object sender, RoutedEventArgs e) {

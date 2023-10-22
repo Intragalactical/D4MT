@@ -27,7 +27,12 @@ public interface ILauncherViewModel : IViewModel<ILauncherViewModel> {
     string GameDirectoryPath { get; set; }
     string ModsDirectoryPath { get; set; }
     string ProjectName { get; set; }
+    string ModName { get; set; }
+    string VisibleName { get; set; }
+    bool SynchronizeModNameWithProjectName { get; set; }
+    bool ValidVisibleName { get; }
     bool ValidProjectName { get; }
+    bool ValidModName { get; }
     bool CanOpenProject { get; }
     bool CanCreateNewProject { get; }
     bool AreProjectsVisible { get; }
@@ -110,32 +115,83 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
     public string ProjectName {
         get { return _projectName ?? string.Empty; }
         set {
-            if (_projectName is null || _projectName.Equals(value) is false) {
+            if (_projectName is null || _projectName.Equals(value, StringComparison.Ordinal) is false) {
                 string transformedValue = _projectNameTransformer.Transform(value);
                 _projectName = transformedValue;
-                NotifyPropertiesChanged(this, nameof(ProjectName), nameof(ValidProjectName));
+                NotifyPropertiesChanged(this, nameof(ProjectName), nameof(ModName), nameof(ValidProjectName), nameof(CanCreateNewProject));
+                if (SynchronizeModNameWithProjectName) {
+                    ModName = transformedValue;
+                }
             }
         }
     }
 
+    private string? _modName = null;
+    public string ModName {
+        get { return _modName ?? string.Empty; }
+        set {
+            if (_modName is null || _modName.Equals(value, StringComparison.Ordinal) is false) {
+                string transformedValue = _projectNameTransformer.Transform(value);
+                _modName = transformedValue;
+                NotifyPropertiesChanged(this, nameof(ModName), nameof(ValidModName), nameof(CanCreateNewProject));
+            }
+        }
+    }
+
+    private string? _visibleName = null;
+    public string VisibleName {
+        get { return _visibleName ?? string.Empty; }
+        set {
+            if (_visibleName is null || _visibleName.Equals(value, StringComparison.Ordinal) is false) {
+                _visibleName = value; // @TODO: add text transformer
+                NotifyPropertiesChanged(this, nameof(VisibleName), nameof(ValidVisibleName), nameof(CanCreateNewProject));
+            }
+        }
+    }
+
+    private bool _synchronizeModNameWithProjectName = true;
+    public bool SynchronizeModNameWithProjectName {
+        get { return _synchronizeModNameWithProjectName; }
+        set {
+            if (_synchronizeModNameWithProjectName.Equals(value) is false) {
+                _synchronizeModNameWithProjectName = value;
+                NotifyPropertyChanged(this);
+            }
+            if (value is true) {
+                ModName = ProjectName;
+            }
+        }
+    }
+    public bool ValidVisibleName {
+        get { return string.IsNullOrWhiteSpace(VisibleName) is false; } // @TODO: validate
+    }
+
     public bool ValidProjectName {
         get {
-            bool invalidName = IsValidConfigurationDirectory(ConfigurationDirectory.Projects) ||
-                string.IsNullOrWhiteSpace(ProjectName) ||
-                _projectNameValidator.IsInvalid(ProjectName) ||
+            return IsValidConfigurationDirectory(ConfigurationDirectory.Projects) &&
+                string.IsNullOrWhiteSpace(ProjectName) is false &&
+                _projectNameValidator.IsValid(ProjectName) &&
                 _projects.GetByName(
                     ProjectsDirectoryPath,
                     ProjectName,
                     _projectNameValidator
                 ) is null or { Exists: false };
-            return invalidName is false;
         }
+    }
+
+    public bool ValidModName {
+        get { return _projectNameValidator.IsValid(ProjectName); }
     }
 
     public bool CanCreateNewProject {
         get {
-            return ValidProjectName &&
+            bool validConfigurationDirectories =
                 AreValidConfigurationDirectories(ConfigurationDirectory.Projects, ConfigurationDirectory.Game, ConfigurationDirectory.Mods);
+            _logger.LogIf(ValidProjectName is false, "CanCreateNewProject is false because project name is not valid.", LogLevel.Trace);
+            _logger.LogIf(ValidModName is false, "CanCreateNewProject is false because mod name is not valid.", LogLevel.Trace);
+            _logger.LogIf(ValidVisibleName is false, "CanCreateNewProject is false because visible name is not valid.", LogLevel.Trace);
+            _logger.LogIf(validConfigurationDirectories is false, "CanCreateNewProject is false because configuration directories are not valid.", LogLevel.Trace);
+            return ValidProjectName && ValidModName && ValidVisibleName && validConfigurationDirectories;
         }
     }
 
@@ -229,7 +285,6 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
 
     private void LauncherViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         _ = Task.Run(e.PropertyName switch {
-            nameof(ProjectName) => NotifyCanCreateNewModChanged,
             nameof(AreProjectsVisible) => EnqueueProjects,
             nameof(ProjectFilter) => RefreshFoundProjectsThreadSafe,
             _ => () => { }
@@ -301,10 +356,6 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
             _ => throw new UnreachableException("")
         };
         NotifyPropertyChanged(this, propertyName);
-    }
-
-    private void NotifyCanCreateNewModChanged() {
-        NotifyPropertyChanged(this, nameof(CanCreateNewProject));
     }
 
     private async Task DequeueAllAndSave(CancellationToken cancellationToken) {
