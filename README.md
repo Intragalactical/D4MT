@@ -6,7 +6,7 @@ D4MT is a modding tool for the game Democracy 4, designed to be as user-friendly
 
 ### Pre-requisites
 
-Windows 10 is preferred, as it's the operating system this project was made on. It should also work on newer Windows versions, if you meet all the other requirements.
+Windows 10 is preferred, as it's the operating system this project was made on. Newer versions of Windows should also work (but isn't guaranteed), if you meet all the other requirements.
 
 Requirements:
 
