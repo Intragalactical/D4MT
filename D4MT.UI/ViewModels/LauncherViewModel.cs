@@ -29,10 +29,14 @@ public interface ILauncherViewModel : IViewModel<ILauncherViewModel> {
     string ProjectName { get; set; }
     string ModName { get; set; }
     string VisibleName { get; set; }
+    string Author { get; set; }
+    string Description { get; set; }
     bool SynchronizeModNameWithProjectName { get; set; }
     bool ValidVisibleName { get; }
     bool ValidProjectName { get; }
     bool ValidModName { get; }
+    bool ValidAuthor { get; }
+    bool ValidDescription { get; }
     bool CanOpenProject { get; }
     bool CanCreateNewProject { get; }
     bool AreProjectsVisible { get; }
@@ -149,6 +153,28 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
         }
     }
 
+    private string? _author = null;
+    public string Author {
+        get { return _author ?? string.Empty; }
+        set {
+            if (_author is null || _author.Equals(value, StringComparison.Ordinal) is false) {
+                _author = value; // @TODO: add text transformer
+                NotifyPropertiesChanged(this, nameof(Author), nameof(ValidAuthor), nameof(CanCreateNewProject));
+            }
+        }
+    }
+
+    private string? _description = null;
+    public string Description {
+        get { return _description ?? string.Empty; }
+        set {
+            if (_description is null || _description.Equals(value, StringComparison.Ordinal) is false) {
+                _description = value; // @TODO: add text transformer
+                NotifyPropertiesChanged(this, nameof(Description), nameof(ValidDescription), nameof(CanCreateNewProject));
+            }
+        }
+    }
+
     private bool _synchronizeModNameWithProjectName = true;
     public bool SynchronizeModNameWithProjectName {
         get { return _synchronizeModNameWithProjectName; }
@@ -162,6 +188,15 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
             }
         }
     }
+
+    public bool ValidAuthor {
+        get { return string.IsNullOrWhiteSpace(Author) is false; } // @TODO: validate
+    }
+
+    public bool ValidDescription {
+        get { return string.IsNullOrWhiteSpace(Description) is false; } // @TODO: validate
+    }
+
     public bool ValidVisibleName {
         get { return string.IsNullOrWhiteSpace(VisibleName) is false; } // @TODO: validate
     }
@@ -190,8 +225,10 @@ public sealed class LauncherViewModel : ViewModel<ILauncherViewModel>, ILauncher
             _logger.LogIf(ValidProjectName is false, "CanCreateNewProject is false because project name is not valid.", LogLevel.Trace);
             _logger.LogIf(ValidModName is false, "CanCreateNewProject is false because mod name is not valid.", LogLevel.Trace);
             _logger.LogIf(ValidVisibleName is false, "CanCreateNewProject is false because visible name is not valid.", LogLevel.Trace);
+            _logger.LogIf(ValidAuthor is false, "CanCreateNewProject is false because author is not valid.", LogLevel.Trace);
+            _logger.LogIf(ValidDescription is false, "CanCreateNewProject is false because description is not valid.", LogLevel.Trace);
             _logger.LogIf(validConfigurationDirectories is false, "CanCreateNewProject is false because configuration directories are not valid.", LogLevel.Trace);
-            return ValidProjectName && ValidModName && ValidVisibleName && validConfigurationDirectories;
+            return ValidProjectName && ValidModName && ValidVisibleName && ValidAuthor && ValidDescription && validConfigurationDirectories;
         }
     }
 

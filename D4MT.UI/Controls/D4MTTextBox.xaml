@@ -5,15 +5,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:D4MT.UI.Controls"
+             xmlns:converters="clr-namespace:D4MT.UI.Converters"
+             MinHeight="25"
              ToolTipService.IsEnabled="{Binding IsToolTipEnabled, Mode=OneWay}"
              mc:Ignorable="d">
     <UserControl.Resources>
-        <VisualBrush x:Key="PlaceholderBrush" Stretch="None" AlignmentX="{Binding Path=PlaceholderHorizontalAlignment, Mode=OneWay}">
+        <converters:TextWrappingToAcceptsReturnConverter x:Key="TextWrappingToAcceptsReturnConverter" />
+        <VisualBrush x:Key="PlaceholderBrush" Stretch="None" AlignmentY="{Binding PlaceholderVerticalAlignment, Mode=OneWay}" AlignmentX="{Binding Path=PlaceholderHorizontalAlignment, Mode=OneWay}">
             <VisualBrush.Transform>
                 <TranslateTransform X="{Binding PlaceholderMarginLeft, Mode=OneWay}" Y="{Binding PlaceholderMarginTop, Mode=OneWay}" />
             </VisualBrush.Transform>
             <VisualBrush.Visual>
                 <TextBlock Text="{Binding PlaceholderText, Mode=OneWay}"
+                           VerticalAlignment="{Binding VerticalTextAlignment, Mode=OneWay}"
                            Foreground="{Binding PlaceholderForeground, Mode=OneWay}"
                            FontSize="{Binding FontSize, Mode=OneWay}" />
             </VisualBrush.Visual>
@@ -21,13 +25,15 @@
     </UserControl.Resources>
     <Grid>
         <TextBox x:Name="UserControlTextBox"
-                 Height="25"
-                 VerticalScrollBarVisibility="Disabled"
-                 VerticalContentAlignment="Center"
+                 VerticalScrollBarVisibility="{Binding VerticalScrollBarVisibility, ElementName=root, Mode=OneWay}"
+                 VerticalContentAlignment="{Binding VerticalTextAlignment, ElementName=root, Mode=OneWay}"
                  Text="{Binding Text, ElementName=root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  TextChanged="UserControlTextBox_TextChanged"
                  LostFocus="UserControlTextBox_LostFocus"
                  ToolTipService.IsEnabled="False"
+                 AcceptsReturn="{Binding TextWrapping, ElementName=root, Mode=OneWay, Converter={StaticResource TextWrappingToAcceptsReturnConverter}}"
+                 TextWrapping="{Binding TextWrapping, ElementName=root, Mode=OneWay}"
+                 Height="{Binding ActualHeight, ElementName=root, Mode=OneWay}"
                  GotFocus="UserControlTextBox_GotFocus">
             <TextBox.Style>
                 <Style TargetType="TextBox">

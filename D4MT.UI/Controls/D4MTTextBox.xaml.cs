@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -51,9 +52,20 @@ public partial class D4MTTextBox : UserControl, INotifyPropertyChanged {
         }
     }
 
-    private double _placeholderMarginTop = 0;
+    public AlignmentY PlaceholderVerticalAlignment {
+        get {
+            return VerticalTextAlignment switch {
+                VerticalAlignment.Top => AlignmentY.Top,
+                VerticalAlignment.Center or VerticalAlignment.Stretch => AlignmentY.Center,
+                VerticalAlignment.Bottom => AlignmentY.Bottom,
+                _ => throw new UnreachableException("")
+            };
+        }
+    }
+
+    private double _placeholderMarginTop = 4;
     public double PlaceholderMarginTop {
-        get { return _placeholderMarginTop; }
+        get { return PlaceholderVerticalAlignment != AlignmentY.Center ? _placeholderMarginTop : 0; }
         set {
             if (_placeholderMarginTop.Equals(value) is false) {
                 _placeholderMarginTop = value;
@@ -68,6 +80,41 @@ public partial class D4MTTextBox : UserControl, INotifyPropertyChanged {
         set {
             if (_placeholderMarginLeft.Equals(value) is false) {
                 _placeholderMarginLeft = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+
+    private ScrollBarVisibility _verticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+    public ScrollBarVisibility VerticalScrollBarVisibility {
+        get { return _verticalScrollBarVisibility; }
+        set {
+            if (_verticalScrollBarVisibility.Equals(value) is false) {
+                _verticalScrollBarVisibility = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+
+    private VerticalAlignment _verticalTextAlignment = VerticalAlignment.Center;
+    public VerticalAlignment VerticalTextAlignment {
+        get { return _verticalTextAlignment; }
+        set {
+            if (_verticalTextAlignment.Equals(value) is false) {
+                _verticalTextAlignment = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged(nameof(PlaceholderVerticalAlignment));
+                NotifyPropertyChanged(nameof(PlaceholderMarginTop));
+            }
+        }
+    }
+
+    private TextWrapping _textWrapping = TextWrapping.NoWrap;
+    public TextWrapping TextWrapping {
+        get { return _textWrapping; }
+        set {
+            if (_textWrapping.Equals(value) is false) {
+                _textWrapping = value;
                 NotifyPropertyChanged();
             }
         }
